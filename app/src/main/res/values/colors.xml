@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta de Azules Médicos UTP OdontoSystem (Basada en la imagen adjunta) -->
+    <color name="primary_night">#00264D</color>
+    <color name="primary_dark">#004080</color>
+    <color name="primary_medium">#005BB5</color>
+    <color name="primary">#0073E6</color>
+    <color name="accent_blue">#0084FF</color>
+    <color name="primary_light">#E6F2FF</color>
+
+    <color name="secondary">#005BB5</color>
+    <color name="accent">#0084FF</color>
+
+    <!-- WhatsApp Green -->
+    <color name="whatsapp_green">#25D366</color>
+    <color name="whatsapp_dark">#128C7E</color>
+
+    <color name="background">#F4F7FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+
+    <color name="success">#10B981</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#EF4444</color>
+
+    <color name="chat_user_bg">#0073E6</color>
+    <color name="chat_bot_bg">#EAF3FF</color>
+    <color name="chat_user_text">#FFFFFF</color>
+    <color name="chat_bot_text">#00264D</color>
+</resources>

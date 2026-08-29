@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OdontoSystem</string>
+    <string name="welcome_back">¡Bienvenido a OdontoSystem!</string>
+    <string name="login_subtitle">Ingresa para gestionar tus citas odontológicas</string>
+    <string name="email_label">Correo Electrónico</string>
+    <string name="password_label">Contraseña</string>
+    <string name="btn_login">Iniciar Sesión</string>
+    <string name="btn_guest">Ingresar en Modo Demo / Invitado</string>
+    <string name="invalid_credentials">Credenciales inválidas. Por favor intenta de nuevo.</string>
+
+    <!-- Main Navigation & Titles -->
+    <string name="title_search_dentists">Buscar Odontólogos</string>
+    <string name="title_my_appointments">Mis Citas Medicas</string>
+
+    <string name="filter_district_hint">Seleccionar Distrito</string>
+    <string name="all_districts">Todos los distritos</string>
+    <string name="search_hint">Buscar por especialidad u odontólogo...</string>
+
+    <!-- Dentist Detail & Booking -->
+    <string name="btn_book_appointment">Reservar Cita</string>
+    <string name="select_date">Seleccionar Fecha</string>
+    <string name="select_time">Seleccionar Hora</string>
+    <string name="reason_label">Motivo de Consulta (Opcional)</string>
+    <string name="btn_confirm_booking">Confirmar Reserva</string>
+    <string name="appointment_success">¡Cita agendada con éxito!</string>
+
+    <!-- Chatbot -->
+    <string name="chatbot_title">Asistente OdontoSystem</string>
+    <string name="chatbot_subtitle">Resuelvo tus dudas y te ayudo a agendar 24/7</string>
+    <string name="chat_input_hint">Escribe tu consulta aquí...</string>
+    <string name="chat_welcome">¡Hola! Soy tu asistente virtual de OdontoSystem. ¿En qué puedo ayudarte hoy?</string>
+
+    <!-- Statuses -->
+    <string name="status_confirmed">Confirmada</string>
+    <string name="status_pending">Pendiente</string>
+    <string name="logout">Cerrar Sesión</string>
+</resources>

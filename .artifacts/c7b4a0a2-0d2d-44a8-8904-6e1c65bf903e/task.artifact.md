@@ -1,0 +1,3 @@
+- [x] Fix `LoginActivity.kt` compilation error
+- [x] Check and fix other Activities (`MainActivity`, `DentistDetailActivity`)
+- [x] Verify build

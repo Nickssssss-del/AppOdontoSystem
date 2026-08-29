@@ -1,0 +1,3 @@
+- [x] Update Gradle version in `gradle-wrapper.properties`
+- [x] Update Kotlin version in root `build.gradle`
+- [x] Verify build and sync project
