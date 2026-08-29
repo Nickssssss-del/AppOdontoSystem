@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -31,6 +32,9 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
   public final ImageView ivDetailAvatar;
 
   @NonNull
+  public final ProgressBar pbOccupancy;
+
+  @NonNull
   public final TextView tvAddress;
 
   @NonNull
@@ -40,6 +44,9 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
   public final TextView tvName;
 
   @NonNull
+  public final TextView tvOccupancyPercent;
+
+  @NonNull
   public final TextView tvPrice;
 
   @NonNull
@@ -47,15 +54,19 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
 
   private ActivityDentistDetailBinding(@NonNull ScrollView rootView,
       @NonNull MaterialButton btnBookAppointment, @NonNull MaterialButton btnDetailWhatsApp,
-      @NonNull ImageView ivDetailAvatar, @NonNull TextView tvAddress, @NonNull TextView tvDays,
-      @NonNull TextView tvName, @NonNull TextView tvPrice, @NonNull TextView tvSpecialty) {
+      @NonNull ImageView ivDetailAvatar, @NonNull ProgressBar pbOccupancy,
+      @NonNull TextView tvAddress, @NonNull TextView tvDays, @NonNull TextView tvName,
+      @NonNull TextView tvOccupancyPercent, @NonNull TextView tvPrice,
+      @NonNull TextView tvSpecialty) {
     this.rootView = rootView;
     this.btnBookAppointment = btnBookAppointment;
     this.btnDetailWhatsApp = btnDetailWhatsApp;
     this.ivDetailAvatar = ivDetailAvatar;
+    this.pbOccupancy = pbOccupancy;
     this.tvAddress = tvAddress;
     this.tvDays = tvDays;
     this.tvName = tvName;
+    this.tvOccupancyPercent = tvOccupancyPercent;
     this.tvPrice = tvPrice;
     this.tvSpecialty = tvSpecialty;
   }
@@ -105,6 +116,12 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.pbOccupancy;
+      ProgressBar pbOccupancy = ViewBindings.findChildViewById(rootView, id);
+      if (pbOccupancy == null) {
+        break missingId;
+      }
+
       id = R.id.tvAddress;
       TextView tvAddress = ViewBindings.findChildViewById(rootView, id);
       if (tvAddress == null) {
@@ -123,6 +140,12 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvOccupancyPercent;
+      TextView tvOccupancyPercent = ViewBindings.findChildViewById(rootView, id);
+      if (tvOccupancyPercent == null) {
+        break missingId;
+      }
+
       id = R.id.tvPrice;
       TextView tvPrice = ViewBindings.findChildViewById(rootView, id);
       if (tvPrice == null) {
@@ -136,7 +159,8 @@ public final class ActivityDentistDetailBinding implements ViewBinding {
       }
 
       return new ActivityDentistDetailBinding((ScrollView) rootView, btnBookAppointment,
-          btnDetailWhatsApp, ivDetailAvatar, tvAddress, tvDays, tvName, tvPrice, tvSpecialty);
+          btnDetailWhatsApp, ivDetailAvatar, pbOccupancy, tvAddress, tvDays, tvName,
+          tvOccupancyPercent, tvPrice, tvSpecialty);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

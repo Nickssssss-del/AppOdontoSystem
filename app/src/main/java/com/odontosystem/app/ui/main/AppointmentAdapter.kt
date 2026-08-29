@@ -39,6 +39,30 @@ class AppointmentAdapter(
             binding.tvStatus.text = appointment.status
             binding.tvReason.text = "Motivo: ${appointment.reason ?: "Consulta general"}"
 
+            // RF04: Habilitar colores según el estado (Atendida, Cancelada, Pendiente, Pausada)
+            when (appointment.status.lowercase()) {
+                "confirmada" -> {
+                    binding.tvStatus.setBackgroundResource(com.odontosystem.app.R.drawable.bg_status_confirmed)
+                    binding.tvStatus.setTextColor(android.graphics.Color.parseColor("#065F46"))
+                }
+                "cancelada" -> {
+                    binding.tvStatus.setBackgroundColor(android.graphics.Color.parseColor("#FEE2E2"))
+                    binding.tvStatus.setTextColor(android.graphics.Color.parseColor("#B91C1C"))
+                }
+                "atendida" -> {
+                    binding.tvStatus.setBackgroundColor(android.graphics.Color.parseColor("#DBEAFE"))
+                    binding.tvStatus.setTextColor(android.graphics.Color.parseColor("#1E40AF"))
+                }
+                "pausada por emergencia" -> {
+                    binding.tvStatus.setBackgroundColor(android.graphics.Color.parseColor("#FEF3C7"))
+                    binding.tvStatus.setTextColor(android.graphics.Color.parseColor("#92400E"))
+                }
+                else -> {
+                    binding.tvStatus.setBackgroundColor(android.graphics.Color.LTGRAY)
+                    binding.tvStatus.setTextColor(android.graphics.Color.BLACK)
+                }
+            }
+
             val canCancel = appointment.status.equals("Confirmada", ignoreCase = true) && onCancelClick != null
             binding.btnCancelAppointment.visibility = if (canCancel) View.VISIBLE else View.GONE
             binding.btnCancelAppointment.setOnClickListener { onCancelClick?.invoke(appointment) }

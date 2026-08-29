@@ -59,6 +59,9 @@ class MockApiInterceptor : Interceptor {
                     put("availableSlots", JSONArray().apply {
                         put("Hoy · 10:30 AM"); put("Hoy · 4:00 PM"); put("Mañana · 9:00 AM")
                     })
+                    put("occupancyLevel", 75)
+                    put("autoConfirm", true)
+                    put("frequency", "WEEKLY")
                 }
 
                 val d2 = JSONObject().apply {
@@ -75,6 +78,9 @@ class MockApiInterceptor : Interceptor {
                     put("availableSlots", JSONArray().apply {
                         put("Hoy · 11:00 AM"); put("Mañana · 3:30 PM")
                     })
+                    put("occupancyLevel", 45)
+                    put("autoConfirm", false)
+                    put("frequency", "DAILY")
                 }
 
                 val d3 = JSONObject().apply {
@@ -91,6 +97,9 @@ class MockApiInterceptor : Interceptor {
                     put("availableSlots", JSONArray().apply {
                         put("Hoy · 8:30 AM"); put("Mañana · 12:00 PM")
                     })
+                    put("occupancyLevel", 90)
+                    put("autoConfirm", true)
+                    put("frequency", "WEEKLY")
                 }
 
                 val d4 = JSONObject().apply {
@@ -107,6 +116,9 @@ class MockApiInterceptor : Interceptor {
                     put("availableSlots", JSONArray().apply {
                         put("Hoy · 5:00 PM"); put("Mañana · 10:00 AM")
                     })
+                    put("occupancyLevel", 30)
+                    put("autoConfirm", true)
+                    put("frequency", "DAILY")
                 }
 
                 val d5 = JSONObject().apply {
@@ -123,6 +135,9 @@ class MockApiInterceptor : Interceptor {
                     put("availableSlots", JSONArray().apply {
                         put("Mañana · 8:00 AM"); put("Mañana · 11:30 AM")
                     })
+                    put("occupancyLevel", 60)
+                    put("autoConfirm", false)
+                    put("frequency", "WEEKLY")
                 }
 
                 array.put(d1)
@@ -146,7 +161,31 @@ class MockApiInterceptor : Interceptor {
                     put("reason", "Revisión de brackets y limpieza")
                     put("status", "Confirmada")
                 }
+                val a2 = JSONObject().apply {
+                    put("id", "apt_5002")
+                    put("dentistId", "dnt_2")
+                    put("dentistName", "Dra. Lucía Salcedo")
+                    put("specialty", "Endodoncia")
+                    put("district", "Parcona")
+                    put("date", "2026-08-20")
+                    put("time", "03:00 PM")
+                    put("reason", "Curación simple")
+                    put("status", "Atendida")
+                }
+                val a3 = JSONObject().apply {
+                    put("id", "apt_5003")
+                    put("dentistId", "dnt_4")
+                    put("dentistName", "Dra. Patricia Valenzuela")
+                    put("specialty", "Ortodoncia")
+                    put("district", "La Tinguiña")
+                    put("date", "2026-08-15")
+                    put("time", "09:00 AM")
+                    put("reason", "Consulta Estética")
+                    put("status", "Cancelada")
+                }
                 array.put(a1)
+                array.put(a2)
+                array.put(a3)
                 responseString = array.toString()
             }
 

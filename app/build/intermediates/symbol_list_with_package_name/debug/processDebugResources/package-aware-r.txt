@@ -3212,6 +3212,7 @@ id bounce
 id bounceBoth
 id bounceEnd
 id bounceStart
+id btnBackLogin
 id btnBook
 id btnBookAppointment
 id btnCancelAppointment
@@ -3222,7 +3223,13 @@ id btnDetailWhatsApp
 id btnEmergencyBlock
 id btnGuest
 id btnLogin
+id btnRegisterSubmit
+id btnResubmit
 id btnSendChat
+id btnUploadColegiatura
+id btnUploadCv
+id btnUploadDni
+id btnUploadTitulo
 id btnWhatsApp
 id buttonPanel
 id cache_measures
@@ -3230,6 +3237,7 @@ id callMeasure
 id cancel_button
 id cardLogin
 id cardNextAppointment
+id cardObservation
 id carryVelocity
 id center
 id centerCrop
@@ -3313,6 +3321,8 @@ id etChatInput
 id etDate
 id etEmail
 id etPassword
+id etRegEmail
+id etRegName
 id etTime
 id exitUntilCollapsed
 id expand_activities_button
@@ -3368,6 +3378,7 @@ id italic
 id item_touch_helper_previous_elevation
 id ivAvatar
 id ivDetailAvatar
+id ivStatusIcon
 id jumpToEnd
 id jumpToStart
 id labeled
@@ -3488,6 +3499,7 @@ id parent_matrix
 id password_toggle
 id path
 id pathRelative
+id pbOccupancy
 id peekHeight
 id percent
 id pin
@@ -3556,6 +3568,7 @@ id south
 id spacer
 id special_effects_controller_view_tag
 id spinnerDistrict
+id spinnerFrequency
 id spline
 id split_action_bar
 id spread
@@ -3578,6 +3591,7 @@ id submenuarrow
 id submit_area
 id supportScrollUp
 id swipeRefresh
+id switchAutoConfirm
 id tabLayout
 id tabMode
 id tabRoleSelector
@@ -3646,14 +3660,19 @@ id tvInitials
 id tvName
 id tvNextDateTime
 id tvNextDentist
+id tvObservationText
+id tvOccupancyPercent
 id tvPrice
 id tvRating
 id tvReason
+id tvRegisterLink
 id tvSelectedSlot
 id tvSlotsHint
 id tvSpecialty
 id tvSpecialtyDistrict
 id tvStatus
+id tvStatusDesc
+id tvStatusTitle
 id tvSubtitle
 id tvTitle
 id tvUserWelcome
@@ -3798,6 +3817,8 @@ layout activity_dentist_dashboard
 layout activity_dentist_detail
 layout activity_login
 layout activity_main
+layout activity_register
+layout activity_verification_status
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog

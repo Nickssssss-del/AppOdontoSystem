@@ -63,9 +63,13 @@ class MainViewModel(
         }
     }
 
+    private val _cancelResult = MutableLiveData<Boolean>()
+    val cancelResult: LiveData<Boolean> = _cancelResult
+
     fun cancelAppointment(appointmentId: String) {
         viewModelScope.launch {
-            appointmentRepository.cancelAppointment(appointmentId)
+            val result = appointmentRepository.cancelAppointment(appointmentId)
+            _cancelResult.value = result.getOrDefault(false)
             loadAppointments()
         }
     }

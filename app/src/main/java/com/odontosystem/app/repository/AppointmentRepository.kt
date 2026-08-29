@@ -68,9 +68,9 @@ class AppointmentRepository(private val apiService: ApiService) {
         }
     }
 
-    suspend fun cancelAppointment(id: String): Result<Unit> = withContext(Dispatchers.IO) {
-        AppointmentStore.cancel(id)
-        Result.success(Unit)
+    suspend fun cancelAppointment(id: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        val success = AppointmentStore.cancel(id)
+        Result.success(success)
     }
 
     fun activateExpressBlock(dentistId: String) {

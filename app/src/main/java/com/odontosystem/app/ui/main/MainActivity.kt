@@ -161,9 +161,12 @@ class MainActivity : AppCompatActivity() {
                 binding.cardNextAppointment.visibility = View.GONE
             }
         }
-        viewModel.isLoading.observe(this) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.swipeRefresh.isRefreshing = false
+        viewModel.cancelResult.observe(this) { success ->
+            if (success) {
+                Toast.makeText(this, "Turno liberado. Recordatorio cancelado.", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "No se puede cancelar: faltan menos de 12 horas para la cita (RF05).", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -174,7 +177,6 @@ class MainActivity : AppCompatActivity() {
             .setMessage("¿Cancelar la cita con ${appointment.dentistName}? El horario quedará libre para otro paciente.")
             .setPositiveButton("Sí, cancelar") { _, _ ->
                 viewModel.cancelAppointment(appointment.id)
-                Toast.makeText(this, "Turno liberado. Recordatorio cancelado.", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Volver", null)
             .show()

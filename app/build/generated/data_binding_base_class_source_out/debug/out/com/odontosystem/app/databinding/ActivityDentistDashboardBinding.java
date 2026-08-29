@@ -4,6 +4,7 @@ package com.odontosystem.app.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.odontosystem.app.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -29,6 +31,12 @@ public final class ActivityDentistDashboardBinding implements ViewBinding {
   public final RecyclerView rvDentistAppointments;
 
   @NonNull
+  public final Spinner spinnerFrequency;
+
+  @NonNull
+  public final MaterialSwitch switchAutoConfirm;
+
+  @NonNull
   public final Toolbar toolbar;
 
   @NonNull
@@ -39,11 +47,14 @@ public final class ActivityDentistDashboardBinding implements ViewBinding {
 
   private ActivityDentistDashboardBinding(@NonNull CoordinatorLayout rootView,
       @NonNull MaterialButton btnEmergencyBlock, @NonNull RecyclerView rvDentistAppointments,
+      @NonNull Spinner spinnerFrequency, @NonNull MaterialSwitch switchAutoConfirm,
       @NonNull Toolbar toolbar, @NonNull TextView tvDentistWelcome,
       @NonNull TextView tvEmptyDentistAgenda) {
     this.rootView = rootView;
     this.btnEmergencyBlock = btnEmergencyBlock;
     this.rvDentistAppointments = rvDentistAppointments;
+    this.spinnerFrequency = spinnerFrequency;
+    this.switchAutoConfirm = switchAutoConfirm;
     this.toolbar = toolbar;
     this.tvDentistWelcome = tvDentistWelcome;
     this.tvEmptyDentistAgenda = tvEmptyDentistAgenda;
@@ -88,6 +99,18 @@ public final class ActivityDentistDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.spinnerFrequency;
+      Spinner spinnerFrequency = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerFrequency == null) {
+        break missingId;
+      }
+
+      id = R.id.switchAutoConfirm;
+      MaterialSwitch switchAutoConfirm = ViewBindings.findChildViewById(rootView, id);
+      if (switchAutoConfirm == null) {
+        break missingId;
+      }
+
       id = R.id.toolbar;
       Toolbar toolbar = ViewBindings.findChildViewById(rootView, id);
       if (toolbar == null) {
@@ -107,7 +130,8 @@ public final class ActivityDentistDashboardBinding implements ViewBinding {
       }
 
       return new ActivityDentistDashboardBinding((CoordinatorLayout) rootView, btnEmergencyBlock,
-          rvDentistAppointments, toolbar, tvDentistWelcome, tvEmptyDentistAgenda);
+          rvDentistAppointments, spinnerFrequency, switchAutoConfirm, toolbar, tvDentistWelcome,
+          tvEmptyDentistAgenda);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

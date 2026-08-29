@@ -26,9 +26,23 @@ class SessionManager(context: Context) {
 
     fun saveAuthToken(token: String) {
         prefs.edit().putString(KEY_JWT_TOKEN, token).apply()
+        // RF01: Guardar también timestamp para simular expiración JWT
+        prefs.edit().putLong(KEY_TOKEN_TIMESTAMP, System.currentTimeMillis()).apply()
+    }
+
+    fun isTokenExpired(): Boolean {
+        val timestamp = prefs.getLong(KEY_TOKEN_TIMESTAMP, 0L)
+        if (timestamp == 0L) return true
+        // Simular expiración de 2 horas para el token JWT
+        val twoHoursMillis = 2 * 60 * 60 * 1000
+        return System.currentTimeMillis() - timestamp > twoHoursMillis
     }
 
     fun fetchAuthToken(): String? {
+        if (isTokenExpired()) {
+            clearSession()
+            return null
+        }
         return prefs.getString(KEY_JWT_TOKEN, null)
     }
 
@@ -75,5 +89,6 @@ class SessionManager(context: Context) {
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"
+        private const val KEY_TOKEN_TIMESTAMP = "token_timestamp"
     }
 }

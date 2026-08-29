@@ -37,8 +37,23 @@ class DentistDashboardActivity : AppCompatActivity() {
         setupToolbar(sessionManager)
         setupRecyclerView()
         setupListeners()
+        setupFrequencySpinner()
         refreshBlockButton()
         loadAgenda()
+    }
+
+    private fun setupFrequencySpinner() {
+        val frequencies = listOf("Diaria", "Semanal")
+        val adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, frequencies)
+        binding.spinnerFrequency.adapter = adapter
+        binding.spinnerFrequency.setSelection(1) // Semanal por defecto
+        
+        binding.spinnerFrequency.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Toast.makeText(this@DentistDashboardActivity, "Frecuencia cambiada a: ${frequencies[position]} (RF06)", Toast.LENGTH_SHORT).show()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
     }
 
     private fun setupToolbar(sessionManager: com.odontosystem.app.data.local.SessionManager) {
@@ -69,6 +84,11 @@ class DentistDashboardActivity : AppCompatActivity() {
             } else {
                 showEmergencyBlockConfirmation()
             }
+        }
+        
+        binding.switchAutoConfirm.setOnCheckedChangeListener { _, isChecked ->
+            val mode = if (isChecked) "Automática" else "Manual"
+            Toast.makeText(this, "Confirmación de citas cambiada a: $mode (RF11)", Toast.LENGTH_SHORT).show()
         }
     }
 

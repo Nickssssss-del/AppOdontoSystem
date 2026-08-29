@@ -9,7 +9,7 @@ data class Appointment(
     val date: String,
     val time: String,
     val reason: String?,
-    val status: String = "Confirmada" // "Confirmada", "Pendiente", "Cancelada"
+    val status: String = "Confirmada" // "Confirmada", "Pendiente", "Cancelada", "Atendida", "Pausada"
 )
 
 data class CreateAppointmentRequest(

@@ -34,6 +34,16 @@ class DentistDetailActivity : AppCompatActivity() {
         binding.tvDays.text = "📅 ${dentist.availableDays.joinToString(", ")} (8:00 AM - 6:00 PM)"
         binding.tvPrice.text = "💳 S/ ${String.format("%.2f", dentist.price)}"
 
+        // RF12: Indicador visual de nivel de ocupación
+        val occupancy = if (dentist.occupancyLevel > 0) dentist.occupancyLevel else (40..90).random()
+        binding.pbOccupancy.progress = occupancy
+        binding.tvOccupancyPercent.text = "$occupancy%"
+        
+        if (occupancy > 80) {
+            binding.pbOccupancy.progressTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.RED)
+            binding.tvOccupancyPercent.setTextColor(android.graphics.Color.RED)
+        }
+
         binding.btnDetailWhatsApp.setOnClickListener {
             openWhatsApp(dentist)
         }

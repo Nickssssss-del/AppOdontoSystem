@@ -60,6 +60,9 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final TextInputLayout tilPassword;
 
   @NonNull
+  public final TextView tvRegisterLink;
+
+  @NonNull
   public final TextView tvSubtitle;
 
   @NonNull
@@ -71,7 +74,7 @@ public final class ActivityLoginBinding implements ViewBinding {
       @NonNull View headerBackground, @NonNull ImageView logoImage,
       @NonNull ProgressBar progressBar, @NonNull TabLayout tabRoleSelector,
       @NonNull TextInputLayout tilEmail, @NonNull TextInputLayout tilPassword,
-      @NonNull TextView tvSubtitle, @NonNull TextView tvTitle) {
+      @NonNull TextView tvRegisterLink, @NonNull TextView tvSubtitle, @NonNull TextView tvTitle) {
     this.rootView = rootView;
     this.btnGuest = btnGuest;
     this.btnLogin = btnLogin;
@@ -84,6 +87,7 @@ public final class ActivityLoginBinding implements ViewBinding {
     this.tabRoleSelector = tabRoleSelector;
     this.tilEmail = tilEmail;
     this.tilPassword = tilPassword;
+    this.tvRegisterLink = tvRegisterLink;
     this.tvSubtitle = tvSubtitle;
     this.tvTitle = tvTitle;
   }
@@ -181,6 +185,12 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvRegisterLink;
+      TextView tvRegisterLink = ViewBindings.findChildViewById(rootView, id);
+      if (tvRegisterLink == null) {
+        break missingId;
+      }
+
       id = R.id.tvSubtitle;
       TextView tvSubtitle = ViewBindings.findChildViewById(rootView, id);
       if (tvSubtitle == null) {
@@ -195,7 +205,7 @@ public final class ActivityLoginBinding implements ViewBinding {
 
       return new ActivityLoginBinding((ScrollView) rootView, btnGuest, btnLogin, cardLogin, etEmail,
           etPassword, headerBackground, logoImage, progressBar, tabRoleSelector, tilEmail,
-          tilPassword, tvSubtitle, tvTitle);
+          tilPassword, tvRegisterLink, tvSubtitle, tvTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
