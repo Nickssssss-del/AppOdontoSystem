@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Theme.OdontoSystem" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorPrimary">@color/brand_medium</item>
+        <item name="colorPrimaryVariant">@color/brand_navy</item>
         <item name="colorOnPrimary">@color/surface</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorSecondary">@color/brand_deep</item>
+        <item name="colorSecondaryVariant">@color/brand_bright</item>
         <item name="colorOnSecondary">@color/surface</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/brand_midnight</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/brand_midnight</item>
     </style>
 
     <style name="Theme.OdontoSystem.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/brand_midnight</item>
     </style>
 </resources>

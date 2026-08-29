@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.odontosystem.app.data.local.AppointmentStore
 import com.odontosystem.app.data.model.Appointment
 import com.odontosystem.app.data.model.Dentist
 import com.odontosystem.app.repository.AppointmentRepository
@@ -21,6 +22,9 @@ class MainViewModel(
     private val _appointments = MutableLiveData<List<Appointment>>()
     val appointments: LiveData<List<Appointment>> = _appointments
 
+    private val _nextAppointment = MutableLiveData<Appointment?>()
+    val nextAppointment: LiveData<Appointment?> = _nextAppointment
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -35,8 +39,8 @@ class MainViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             val result = dentistRepository.getDentists(selectedDistrict)
-            result.onSuccess {
-                _dentists.value = it
+            result.onSuccess { list ->
+                _dentists.value = list
             }.onFailure {
                 _dentists.value = emptyList()
             }
@@ -48,12 +52,21 @@ class MainViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             val result = appointmentRepository.getAppointments()
-            result.onSuccess {
-                _appointments.value = it
+            result.onSuccess { list ->
+                _appointments.value = list
+                _nextAppointment.value = AppointmentStore.nextConfirmed(list)
             }.onFailure {
                 _appointments.value = emptyList()
+                _nextAppointment.value = null
             }
             _isLoading.value = false
+        }
+    }
+
+    fun cancelAppointment(appointmentId: String) {
+        viewModelScope.launch {
+            appointmentRepository.cancelAppointment(appointmentId)
+            loadAppointments()
         }
     }
 }

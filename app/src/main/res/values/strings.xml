@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">OdontoSystem</string>
     <string name="welcome_back">¡Bienvenido a OdontoSystem!</string>
-    <string name="login_subtitle">Ingresa para gestionar tus citas odontológicas</string>
+    <string name="login_subtitle">Reserva odontólogos independientes en Ica sin llamadas</string>
     <string name="email_label">Correo Electrónico</string>
     <string name="password_label">Contraseña</string>
     <string name="btn_login">Iniciar Sesión</string>
@@ -18,7 +18,7 @@
     <string name="search_hint">Buscar por especialidad u odontólogo...</string>
 
     <!-- Dentist Detail & Booking -->
-    <string name="btn_book_appointment">Reservar Cita</string>
+    <string name="btn_book_appointment">Reserva express</string>
     <string name="select_date">Seleccionar Fecha</string>
     <string name="select_time">Seleccionar Hora</string>
     <string name="reason_label">Motivo de Consulta (Opcional)</string>

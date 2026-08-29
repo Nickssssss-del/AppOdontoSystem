@@ -1,5 +1,6 @@
 package com.odontosystem.app.repository
 
+import com.odontosystem.app.data.local.AppointmentStore
 import com.odontosystem.app.data.model.Appointment
 import com.odontosystem.app.data.model.CreateAppointmentRequest
 import com.odontosystem.app.data.remote.ApiService
@@ -8,20 +9,17 @@ import kotlinx.coroutines.withContext
 
 class AppointmentRepository(private val apiService: ApiService) {
 
-    private val localAppointments = mutableListOf<Appointment>()
-
     suspend fun getAppointments(): Result<List<Appointment>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getAppointments()
-            if (response.isSuccessful && response.body() != null) {
-                val remoteList = response.body()!!
-                val combined = (localAppointments + remoteList).distinctBy { it.id }
-                Result.success(combined)
+            val remote = if (response.isSuccessful && response.body() != null) {
+                response.body()!!
             } else {
-                Result.success(localAppointments.toList())
+                emptyList()
             }
+            Result.success(AppointmentStore.merge(remote))
         } catch (e: Exception) {
-            Result.success(localAppointments.toList())
+            Result.success(AppointmentStore.merge(emptyList()))
         }
     }
 
@@ -34,46 +32,48 @@ class AppointmentRepository(private val apiService: ApiService) {
         time: String,
         reason: String?
     ): Result<Appointment> = withContext(Dispatchers.IO) {
+        val fallback = Appointment(
+            id = "apt_" + System.currentTimeMillis(),
+            dentistId = dentistId,
+            dentistName = dentistName,
+            specialty = specialty,
+            district = district,
+            date = date,
+            time = time,
+            reason = reason ?: "Reserva express",
+            status = "Confirmada"
+        )
         try {
             val req = CreateAppointmentRequest(dentistId, date, time, reason)
             val response = apiService.createAppointment(req)
-            if (response.isSuccessful && response.body() != null) {
-                val created = response.body()!!.copy(
-                    dentistName = dentistName,
-                    specialty = specialty,
-                    district = district
-                )
-                localAppointments.add(0, created)
-                Result.success(created)
-            } else {
-                val fallback = Appointment(
-                    id = "apt_" + System.currentTimeMillis(),
+            val created = if (response.isSuccessful && response.body() != null) {
+                response.body()!!.copy(
                     dentistId = dentistId,
                     dentistName = dentistName,
                     specialty = specialty,
                     district = district,
                     date = date,
                     time = time,
-                    reason = reason,
+                    reason = reason ?: "Reserva express",
                     status = "Confirmada"
                 )
-                localAppointments.add(0, fallback)
-                Result.success(fallback)
+            } else {
+                fallback
             }
+            AppointmentStore.add(created)
+            Result.success(created)
         } catch (e: Exception) {
-            val fallback = Appointment(
-                id = "apt_" + System.currentTimeMillis(),
-                dentistId = dentistId,
-                dentistName = dentistName,
-                specialty = specialty,
-                district = district,
-                date = date,
-                time = time,
-                reason = reason,
-                status = "Confirmada"
-            )
-            localAppointments.add(0, fallback)
+            AppointmentStore.add(fallback)
             Result.success(fallback)
         }
+    }
+
+    suspend fun cancelAppointment(id: String): Result<Unit> = withContext(Dispatchers.IO) {
+        AppointmentStore.cancel(id)
+        Result.success(Unit)
+    }
+
+    fun activateExpressBlock(dentistId: String) {
+        AppointmentStore.activateExpressBlock(dentistId)
     }
 }

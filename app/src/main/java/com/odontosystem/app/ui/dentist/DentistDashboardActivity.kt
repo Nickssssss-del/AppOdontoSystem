@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.odontosystem.app.OdontoApplication
-import com.odontosystem.app.data.model.Appointment
+import com.odontosystem.app.data.local.AppointmentStore
 import com.odontosystem.app.data.remote.RetrofitClient
 import com.odontosystem.app.databinding.ActivityDentistDashboardBinding
 import com.odontosystem.app.repository.AppointmentRepository
@@ -23,10 +23,10 @@ class DentistDashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDentistDashboardBinding
     private lateinit var appointmentAdapter: AppointmentAdapter
-    private val appointmentsList = mutableListOf<Appointment>()
+    private val dentistId = "dnt_1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate()
+        super.onCreate(savedInstanceState)
         binding = ActivityDentistDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -37,6 +37,7 @@ class DentistDashboardActivity : AppCompatActivity() {
         setupToolbar(sessionManager)
         setupRecyclerView()
         setupListeners()
+        refreshBlockButton()
         loadAgenda()
     }
 
@@ -45,8 +46,7 @@ class DentistDashboardActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.itemId == com.odontosystem.app.R.id.action_logout) {
                 sessionManager.clearSession()
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, LoginActivity::class.java))
                 finish()
                 true
             } else false
@@ -61,15 +61,22 @@ class DentistDashboardActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         binding.btnEmergencyBlock.setOnClickListener {
-            showEmergencyBlockConfirmation()
+            if (AppointmentStore.isExpressBlocked(dentistId)) {
+                AppointmentStore.clearExpressBlock()
+                refreshBlockButton()
+                loadAgenda()
+                Toast.makeText(this, "Bloqueo Express desactivado. La agenda de hoy vuelve a publicarse.", Toast.LENGTH_LONG).show()
+            } else {
+                showEmergencyBlockConfirmation()
+            }
         }
     }
 
     private fun showEmergencyBlockConfirmation() {
         AlertDialog.Builder(this)
-            .setTitle("🚨 Confirmar Bloqueo Express")
-            .setMessage("¿Deseas pausar tus turnos de hoy por una emergencia? Los pacientes con cita para hoy serán notificados automáticamente.")
-            .setPositiveButton("Sí, Pausar Turnos de Hoy") { _, _ ->
+            .setTitle("Bloqueo Express")
+            .setMessage("Se pausarán solo los turnos de hoy. Los pacientes con cita serán notificados y esos horarios desaparecerán del buscador. La agenda de las próximas semanas no cambia.")
+            .setPositiveButton("Pausar turnos de hoy") { _, _ ->
                 executeEmergencyBlock()
             }
             .setNegativeButton("Cancelar", null)
@@ -77,22 +84,44 @@ class DentistDashboardActivity : AppCompatActivity() {
     }
 
     private fun executeEmergencyBlock() {
-        appointmentsList.clear()
-        appointmentAdapter.submitList(appointmentsList)
-        binding.tvEmptyDentistAgenda.visibility = View.VISIBLE
-        binding.tvEmptyDentistAgenda.text = "⚠️ Se ha activado el Bloqueo Express de Emergencia. Tus turnos de hoy han sido pausados y los pacientes fueron notificados."
-        Toast.makeText(this, "Bloqueo Express activado. Notificaciones enviadas.", Toast.LENGTH_LONG).show()
+        AppointmentRepository(RetrofitClient.apiService).activateExpressBlock(dentistId)
+        refreshBlockButton()
+        loadAgenda()
+        Toast.makeText(this, "Bloqueo Express activo. Pacientes notificados y turnos de hoy retirados.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun refreshBlockButton() {
+        val blocked = AppointmentStore.isExpressBlocked(dentistId)
+        binding.btnEmergencyBlock.text = if (blocked) {
+            "Desactivar Bloqueo Express"
+        } else {
+            "Activar Bloqueo Express de Hoy"
+        }
     }
 
     private fun loadAgenda() {
         CoroutineScope(Dispatchers.Main).launch {
             val repository = AppointmentRepository(RetrofitClient.apiService)
-            val result = repository.getAppointments()
+            val result = withContext(Dispatchers.IO) { repository.getAppointments() }
             result.onSuccess { list ->
-                appointmentsList.clear()
-                appointmentsList.addAll(list)
-                appointmentAdapter.submitList(appointmentsList)
-                binding.tvEmptyDentistAgenda.visibility = if (appointmentsList.isEmpty()) View.VISIBLE else View.GONE
+                val mine = list.filter { it.dentistId == dentistId || it.dentistName.contains("Ramos") || it.dentistName.contains("Mendoza") }
+                appointmentAdapter.submitList(mine)
+                val blocked = AppointmentStore.isExpressBlocked(dentistId)
+                if (mine.isEmpty()) {
+                    binding.tvEmptyDentistAgenda.visibility = View.VISIBLE
+                    binding.tvEmptyDentistAgenda.text =
+                        if (blocked) {
+                            "Bloqueo Express activo: los turnos de hoy están pausados y no se muestran a los pacientes."
+                        } else {
+                            "No tienes citas pendientes para el día de hoy."
+                        }
+                } else {
+                    binding.tvEmptyDentistAgenda.visibility = if (blocked) View.VISIBLE else View.GONE
+                    if (blocked) {
+                        binding.tvEmptyDentistAgenda.text =
+                            "Bloqueo Express activo. Las citas de hoy figuran como pausadas; el horario base de próximas semanas se mantiene."
+                    }
+                }
             }
         }
     }

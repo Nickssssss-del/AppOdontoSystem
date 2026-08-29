@@ -1,13 +1,18 @@
 package com.odontosystem.app.ui.main
 
 import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.odontosystem.app.OdontoApplication
+import com.odontosystem.app.data.model.Appointment
 import com.odontosystem.app.data.model.Dentist
 import com.odontosystem.app.data.remote.RetrofitClient
 import com.odontosystem.app.databinding.ActivityMainBinding
@@ -21,13 +26,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-
     private lateinit var dentistAdapter: DentistAdapter
     private lateinit var appointmentAdapter: AppointmentAdapter
+    private var currentTab = 0
+    private var nextAppointment: Appointment? = null
 
-    private var currentTab = 0 // 0: Dentists, 1: Appointments
-
-    public override fun onCreate(savedInstanceState: android.os.Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -47,8 +51,8 @@ class MainActivity : AppCompatActivity() {
         setupListeners()
         observeViewModel()
 
-
         viewModel.loadDentists()
+        viewModel.loadAppointments()
     }
 
     private fun setupToolbar(sessionManager: com.odontosystem.app.data.local.SessionManager) {
@@ -56,8 +60,7 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.itemId == com.odontosystem.app.R.id.action_logout) {
                 sessionManager.clearSession()
-                val intent = Intent(this, com.odontosystem.app.ui.auth.LoginActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, com.odontosystem.app.ui.auth.LoginActivity::class.java))
                 finish()
                 true
             } else false
@@ -65,33 +68,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerViews() {
-
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-
         dentistAdapter = DentistAdapter(
             onDentistClick = { dentist -> openDentistDetail(dentist) },
-            onBookClick = { dentist -> openBookAppointmentDialog(dentist) }
+            onBookClick = { dentist -> openBookAppointmentDialog(dentist, null) },
+            onSlotClick = { dentist, slot -> openBookAppointmentDialog(dentist, slot) },
+            onWhatsAppClick = { dentist -> openWhatsApp(dentist) }
         )
-
-        appointmentAdapter = AppointmentAdapter()
+        appointmentAdapter = AppointmentAdapter { appointment ->
+            confirmCancel(appointment)
+        }
         binding.recyclerView.adapter = dentistAdapter
     }
 
     private fun setupSpinner() {
         val districts = listOf(
             "Todos los distritos",
-            "Miraflores",
-            "San Isidro",
-            "Surco",
-            "San Borja"
+            "Ica",
+            "Parcona",
+            "Los Aquijes",
+            "La Tinguiña",
+            "Subtanjalla"
         )
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, districts)
-        binding.spinnerDistrict.adapter = spinnerAdapter
-
+        binding.spinnerDistrict.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, districts)
         binding.spinnerDistrict.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selected = districts[position]
-                viewModel.setDistrictFilter(selected)
+                viewModel.setDistrictFilter(districts[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -104,10 +107,13 @@ class MainActivity : AppCompatActivity() {
                 currentTab = tab?.position ?: 0
                 if (currentTab == 0) {
                     binding.spinnerDistrict.visibility = View.VISIBLE
+                    binding.cardNextAppointment.visibility =
+                        if (nextAppointment != null) View.VISIBLE else View.GONE
                     binding.recyclerView.adapter = dentistAdapter
                     viewModel.loadDentists()
                 } else {
                     binding.spinnerDistrict.visibility = View.GONE
+                    binding.cardNextAppointment.visibility = View.GONE
                     binding.recyclerView.adapter = appointmentAdapter
                     viewModel.loadAppointments()
                 }
@@ -121,11 +127,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.swipeRefresh.setOnRefreshListener {
             if (currentTab == 0) viewModel.loadDentists() else viewModel.loadAppointments()
+            viewModel.loadAppointments()
         }
-
         binding.fabChatbot.setOnClickListener {
-            val chatbotBottomSheet = ChatbotBottomSheetDialogFragment()
-            chatbotBottomSheet.show(supportFragmentManager, "ChatbotWidget")
+            ChatbotBottomSheetDialogFragment().show(supportFragmentManager, "ChatbotWidget")
+        }
+        binding.btnCancelNext.setOnClickListener {
+            nextAppointment?.let { confirmCancel(it) }
         }
     }
 
@@ -136,36 +144,68 @@ class MainActivity : AppCompatActivity() {
                 binding.tvEmptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
             }
         }
-
         viewModel.appointments.observe(this) { list ->
             if (currentTab == 1) {
                 appointmentAdapter.submitList(list)
                 binding.tvEmptyState.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
             }
         }
-
+        viewModel.nextAppointment.observe(this) { appointment ->
+            nextAppointment = appointment
+            if (appointment != null && currentTab == 0) {
+                binding.cardNextAppointment.visibility = View.VISIBLE
+                binding.tvNextDentist.text = appointment.dentistName
+                binding.tvNextDateTime.text =
+                    "${appointment.date} · ${appointment.time} · ${appointment.district}"
+            } else if (currentTab == 0) {
+                binding.cardNextAppointment.visibility = View.GONE
+            }
+        }
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
             binding.swipeRefresh.isRefreshing = false
         }
     }
 
-    private fun openDentistDetail(dentist: Dentist) {
-        val intent = Intent(this, DentistDetailActivity::class.java).apply {
-            putExtra("dentist", dentist)
-        }
-        startActivity(intent)
+    private fun confirmCancel(appointment: Appointment) {
+        if (!appointment.status.equals("Confirmada", ignoreCase = true)) return
+        AlertDialog.Builder(this)
+            .setTitle("Liberar turno")
+            .setMessage("¿Cancelar la cita con ${appointment.dentistName}? El horario quedará libre para otro paciente.")
+            .setPositiveButton("Sí, cancelar") { _, _ ->
+                viewModel.cancelAppointment(appointment.id)
+                Toast.makeText(this, "Turno liberado. Recordatorio cancelado.", Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("Volver", null)
+            .show()
     }
 
-    private fun openBookAppointmentDialog(dentist: Dentist) {
-        val dialog = BookAppointmentDialogFragment.newInstance(dentist) {
+    private fun openDentistDetail(dentist: Dentist) {
+        startActivity(Intent(this, DentistDetailActivity::class.java).apply {
+            putExtra("dentist", dentist)
+        })
+    }
+
+    private fun openBookAppointmentDialog(dentist: Dentist, slot: String?) {
+        BookAppointmentDialogFragment.newInstance(dentist, slot) {
             viewModel.loadAppointments()
+        }.show(supportFragmentManager, "BookAppointment")
+    }
+
+    private fun openWhatsApp(dentist: Dentist) {
+        val message =
+            "Hola ${dentist.name}, te contacto desde OdontoSystem para una consulta en ${dentist.district}."
+        val url = "https://api.whatsapp.com/send?phone=${dentist.phone}&text=${Uri.encode(message)}"
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: Exception) {
+            Toast.makeText(this, "No se pudo abrir WhatsApp.", Toast.LENGTH_SHORT).show()
         }
-        dialog.show(supportFragmentManager, "BookAppointment")
     }
 
     override fun onResume() {
         super.onResume()
-        if (currentTab == 1) viewModel.loadAppointments()
+        viewModel.loadAppointments()
+        if (currentTab == 0) viewModel.loadDentists()
     }
 }

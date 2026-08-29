@@ -43,6 +43,11 @@
             android:parentActivityName=".ui.main.MainActivity"
             android:theme="@style/Theme.OdontoSystem" />
 
+        <activity
+            android:name=".ui.dentist.DentistDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OdontoSystem" />
+
     </application>
 
 </manifest>

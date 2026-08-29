@@ -12,7 +12,8 @@ data class Dentist(
     val reviewsCount: Int,
     val price: Double,
     val availableDays: List<String>,
-    val phone: String = "51987654321", // Número telefónico para enlace directo con la API de WhatsApp
+    val availableSlots: List<String>? = emptyList(),
+    val phone: String = "51987654321",
     val imageUrl: String? = null,
     val avatarInitials: String = "DR"
 ) : Serializable

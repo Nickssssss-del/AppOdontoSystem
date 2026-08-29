@@ -22,7 +22,7 @@ class ChatbotViewModel(private val chatRepository: ChatRepository) : ViewModel()
         currentList.add(
             ChatMessage(
                 id = UUID.randomUUID().toString(),
-                text = "¡Hola! Soy tu asistente virtual de OdontoSystem 🤖. ¿En qué puedo ayudarte hoy? Puedo asistirte en la búsqueda de especialistas por distrito, consulta de tarifas o asesoramiento para agendar citas.",
+                text = "¡Hola! Soy el asistente de OdontoSystem. Recuerdo lo que conversamos en esta sesión. Puedo ayudarte a filtrar odontólogos en Ica, reservar un turno libre o cancelar tu próxima cita.",
                 sender = SenderType.BOT
             )
         )

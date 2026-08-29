@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta de Azules Médicos UTP OdontoSystem (Basada en la imagen adjunta) -->
-    <color name="primary_night">#00264D</color>
-    <color name="primary_dark">#004080</color>
-    <color name="primary_medium">#005BB5</color>
-    <color name="primary">#0073E6</color>
-    <color name="accent_blue">#0084FF</color>
-    <color name="primary_light">#E6F2FF</color>
+    <!-- Paleta oficial OdontoSystemMobile -->
+    <color name="brand_bright">#0084FF</color>
+    <color name="brand_medium">#0E74DF</color>
+    <color name="brand_deep">#0B5EB8</color>
+    <color name="brand_navy">#0B488A</color>
+    <color name="brand_midnight">#092E5B</color>
 
-    <color name="secondary">#005BB5</color>
+    <color name="primary_night">#092E5B</color>
+    <color name="primary_dark">#0B488A</color>
+    <color name="primary_medium">#0B5EB8</color>
+    <color name="primary">#0E74DF</color>
+    <color name="accent_blue">#0084FF</color>
+    <color name="primary_light">#E8F3FF</color>
+
+    <color name="secondary">#0B5EB8</color>
     <color name="accent">#0084FF</color>
 
-    <!-- WhatsApp Green -->
     <color name="whatsapp_green">#25D366</color>
     <color name="whatsapp_dark">#128C7E</color>
 
-    <color name="background">#F4F7FA</color>
+    <color name="background">#F3F7FC</color>
     <color name="surface">#FFFFFF</color>
     <color name="card_background">#FFFFFF</color>
 
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#475569</color>
-    <color name="text_muted">#94A3B8</color>
+    <color name="text_primary">#092E5B</color>
+    <color name="text_secondary">#3D5A80</color>
+    <color name="text_muted">#7A93B2</color>
 
     <color name="success">#10B981</color>
     <color name="warning">#F59E0B</color>
     <color name="error">#EF4444</color>
 
-    <color name="chat_user_bg">#0073E6</color>
-    <color name="chat_bot_bg">#EAF3FF</color>
+    <color name="chat_user_bg">#0E74DF</color>
+    <color name="chat_bot_bg">#E8F3FF</color>
     <color name="chat_user_text">#FFFFFF</color>
-    <color name="chat_bot_text">#00264D</color>
+    <color name="chat_bot_text">#092E5B</color>
 </resources>

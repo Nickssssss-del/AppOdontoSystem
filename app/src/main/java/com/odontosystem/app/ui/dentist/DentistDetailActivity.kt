@@ -14,7 +14,7 @@ class DentistDetailActivity : AppCompatActivity() {
     private var dentist: Dentist? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate()
+        super.onCreate(savedInstanceState)
         binding = ActivityDentistDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -39,7 +39,7 @@ class DentistDetailActivity : AppCompatActivity() {
         }
 
         binding.btnBookAppointment.setOnClickListener {
-            val dialog = BookAppointmentDialogFragment.newInstance(dentist) {
+            val dialog = BookAppointmentDialogFragment.newInstance(dentist, null) {
                 Toast.makeText(this, "¡Cita reservada con éxito!", Toast.LENGTH_LONG).show()
                 finish()
             }
