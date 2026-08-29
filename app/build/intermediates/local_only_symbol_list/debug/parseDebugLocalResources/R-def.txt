@@ -38,6 +38,7 @@ drawable bg_status_confirmed
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_whatsapp
+drawable logo_odonto
 id action_logout
 id btnBackLogin
 id btnBook

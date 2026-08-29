@@ -4,55 +4,43 @@
         "source": "com.odontosystem.app-main-6:/layout/activity_dentist_detail.xml"
     },
     {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\activity_dentist_dashboard.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\activity_dentist_dashboard.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\dialog_chatbot.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\dialog_chatbot.xml"
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/item_dentist.xml",
+        "source": "com.odontosystem.app-main-6:/layout/item_dentist.xml"
     },
     {
         "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/activity_login.xml",
         "source": "com.odontosystem.app-main-6:/layout/activity_login.xml"
     },
     {
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/dialog_book_appointment.xml",
+        "source": "com.odontosystem.app-main-6:/layout/dialog_book_appointment.xml"
+    },
+    {
         "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/activity_register.xml",
         "source": "com.odontosystem.app-main-6:/layout/activity_register.xml"
     },
     {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\dialog_book_appointment.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\dialog_book_appointment.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\item_appointment.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\item_appointment.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\item_chat_message.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\item_chat_message.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\item_dentist.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\item_dentist.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\activity_dentist_detail.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\activity_dentist_detail.xml"
-    },
-    {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\activity_main.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\activity_main.xml"
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/item_appointment.xml",
+        "source": "com.odontosystem.app-main-6:/layout/item_appointment.xml"
     },
     {
         "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/activity_verification_status.xml",
         "source": "com.odontosystem.app-main-6:/layout/activity_verification_status.xml"
     },
     {
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/item_chat_message.xml",
+        "source": "com.odontosystem.app-main-6:/layout/item_chat_message.xml"
+    },
+    {
         "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/activity_dentist_dashboard.xml",
         "source": "com.odontosystem.app-main-6:/layout/activity_dentist_dashboard.xml"
     },
     {
-        "merged": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-mergeDebugResources-3:\\layout\\activity_login.xml",
-        "source": "C:\\Users\\DeLaC\\.gradle\\daemon\\8.13\\com.odontosystem.app-main-6:\\layout\\activity_login.xml"
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/activity_main.xml",
+        "source": "com.odontosystem.app-main-6:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.odontosystem.app-mergeDebugResources-3:/layout/dialog_chatbot.xml",
+        "source": "com.odontosystem.app-main-6:/layout/dialog_chatbot.xml"
     }
 ]

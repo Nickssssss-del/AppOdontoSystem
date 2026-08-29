@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             if (success) {
                 Toast.makeText(this, "Turno liberado. Recordatorio cancelado.", Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, "No se puede cancelar: faltan menos de 12 horas para la cita (RF05).", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "No se puede cancelar: faltan menos de 12 horas para la cita.", Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -61,6 +61,17 @@
             android:name="com.odontosystem.app.ui.dentist.DentistDashboardActivity"
             android:exported="false"
             android:theme="@style/Theme.OdontoSystem" />
+        <activity
+            android:name="com.odontosystem.app.ui.auth.RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OdontoSystem.NoActionBar" />
+        <activity
+            android:name="com.odontosystem.app.ui.dentist.VerificationStatusActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OdontoSystem" />
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            android:exported="true" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

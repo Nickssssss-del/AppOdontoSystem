@@ -11,6 +11,11 @@ interface ApiService {
         @Body request: AuthRequest
     ): Response<AuthResponse>
 
+    @POST("api/v1/auth/register")
+    suspend fun register(
+        @Body request: RegisterRequest
+    ): Response<AuthResponse>
+
     @GET("api/v1/dentists")
     suspend fun getDentists(
         @Query("district") district: String? = null,

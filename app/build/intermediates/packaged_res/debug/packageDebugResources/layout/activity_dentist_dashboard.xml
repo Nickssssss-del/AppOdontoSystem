@@ -145,7 +145,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Confirmación Automática (RF11)"
+                            android:text="Confirmación Automática"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
 
@@ -167,7 +167,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Frecuencia de Disponibilidad (RF06)"
+                            android:text="Frecuencia de Disponibilidad"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
 

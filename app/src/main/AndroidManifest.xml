@@ -48,6 +48,16 @@
             android:exported="false"
             android:theme="@style/Theme.OdontoSystem" />
 
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OdontoSystem.NoActionBar" />
+
+        <activity
+            android:name=".ui.dentist.VerificationStatusActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OdontoSystem" />
+
     </application>
 
 </manifest>

@@ -76,7 +76,7 @@ object AppointmentStore {
     fun visibleSlots(dentistId: String, slots: List<String>?): List<String> {
         val list = slots.orEmpty().filter { it.isNotBlank() }
         
-        // Liberación automática e inmediata (RF05):
+        // Liberación automática e inmediata:
         // Filtramos slots que ya están en 'created' pero no en 'cancelledIds'
         val reservedSlots = created
             .filter { it.dentistId == dentistId && it.id !in cancelledIds }

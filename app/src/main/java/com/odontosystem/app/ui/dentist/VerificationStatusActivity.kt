@@ -22,7 +22,7 @@ class VerificationStatusActivity : AppCompatActivity() {
     private fun setupView(status: String) {
         when(status) {
             "Observado" -> {
-                binding.tvStatusTitle.text = "Perfil Observado (RF09)"
+                binding.tvStatusTitle.text = "Perfil Observado"
                 binding.cardObservation.visibility = View.VISIBLE
                 binding.ivStatusIcon.setImageResource(android.R.drawable.ic_dialog_alert)
                 binding.ivStatusIcon.setColorFilter(android.graphics.Color.parseColor("#F59E0B"))
@@ -39,7 +39,7 @@ class VerificationStatusActivity : AppCompatActivity() {
         }
 
         binding.btnResubmit.setOnClickListener {
-            Toast.makeText(this, "Documento re-subido con éxito (RF08). Pendiente de nueva revisión.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Documento re-subido con éxito. Pendiente de nueva revisión.", Toast.LENGTH_LONG).show()
             finish()
         }
 

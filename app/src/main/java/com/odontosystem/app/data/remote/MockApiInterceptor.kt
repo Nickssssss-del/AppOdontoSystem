@@ -42,6 +42,18 @@ class MockApiInterceptor : Interceptor {
                 responseString = json.toString()
             }
 
+            path.contains("auth/register") -> {
+                val json = JSONObject()
+                json.put("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_jwt_token_odontosystem_reg")
+                val userJson = JSONObject()
+                userJson.put("id", "usr_" + System.currentTimeMillis())
+                userJson.put("name", "Usuario Registrado")
+                userJson.put("email", "nuevo@odontosystem.com")
+                userJson.put("role", "PATIENT")
+                json.put("user", userJson)
+                responseString = json.toString()
+            }
+
             path.contains("dentists") -> {
                 val array = JSONArray()
 

@@ -1,23 +1,14 @@
-# Tareas de Implementación - Matriz de Requerimientos Oficial
+# Tareas de Implementación: Capa de Datos para Registro
 
-- `[x]` **Modelos de Datos y Lógica de Negocio**
-    - `[x]` Actualizar `Dentist.kt` (ocupación, auto-confirmación, frecuencia)
-    - `[x]` Actualizar `Appointment.kt` (estados: ATENDIDA, OBSERVADA, etc.)
-    - `[x]` Implementar regla de 12h y liberación inmediata en `AppointmentStore.kt`
-- `[x]` **Seguridad (RF01, RNF01)**
-    - `[x]` Reforzar `SessionManager.kt` y `AuthInterceptor.kt`
-- `[x]` **UI Odontólogo (RF06, RF07, RF11, RF12)**
-    - `[x]` Modificar `DentistDashboardActivity.kt` y layout (Toggle auto-confirm, Frecuencia)
-    - `[x]` Actualizar `DentistDetailActivity.kt` (Indicador de ocupación)
-- `[x]` **UI Paciente e Historial (RF02-RF05)**
-    - `[x]` Validar flujo de <4 clics en `MainActivity.kt` e `DentistAdapter.kt`
-    - `[x]` Actualizar `AppointmentAdapter.kt` con estilos por estado
-- `[x]` **Registro y Validación Profesional (RF08, RF09)**
-    - `[x]` Crear `RegisterActivity.kt` (Subida de 4 documentos)
-    - `[x]` Crear `VerificationStatusActivity.kt` (Estados de aprobación)
-- `[x]` **Infraestructura de Demo**
-    - `[x]` Actualizar `MockApiInterceptor.kt` con nuevos flujos y datos
-- `[x]` **Documentación Final**
-    - `[x]` Actualización integral de `README.md`
-- `[x]` **Verificación Final**
-    - `[x]` Sincronización Gradle y comprobación de errores
+- `[x]` **Modelos y API**
+    - `[x]` Añadir `RegisterRequest` en `AuthModels.kt`
+    - `[x]` Añadir `register` en `ApiService.kt`
+- `[x]` **Repositorio y Mock**
+    - `[x]` Implementar `register` en `AuthRepository.kt`
+    - `[x]` Configurar intercepción de registro en `MockApiInterceptor.kt`
+- `[x]` **Lógica de UI y Navegación**
+    - `[x]` Añadir lógica de registro en `LoginViewModel.kt`
+    - `[x]` Conectar `RegisterScreen.kt` al ViewModel y gestionar navegación post-registro
+- `[x]` **Verificación**
+    - `[x]` Compilación exitosa
+    - `[x]` Prueba manual del flujo de registro completo

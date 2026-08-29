@@ -26,9 +26,9 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.btnRegisterSubmit.setOnClickListener {
             if (uploadedDocs.size < 4) {
-                Toast.makeText(this, "Por favor, sube los 4 documentos requeridos (RF08).", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Por favor, sube los 4 documentos requeridos.", Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(this, "Registro enviado. El administrador revisará tu perfil (RF09).", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Registro enviado. El administrador revisará tu perfil.", Toast.LENGTH_LONG).show()
                 finish()
             }
         }

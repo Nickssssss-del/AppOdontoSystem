@@ -50,7 +50,7 @@ class DentistDashboardActivity : AppCompatActivity() {
         
         binding.spinnerFrequency.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Toast.makeText(this@DentistDashboardActivity, "Frecuencia cambiada a: ${frequencies[position]} (RF06)", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DentistDashboardActivity, "Frecuencia cambiada a: ${frequencies[position]}", Toast.LENGTH_SHORT).show()
             }
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
         }
@@ -88,7 +88,7 @@ class DentistDashboardActivity : AppCompatActivity() {
         
         binding.switchAutoConfirm.setOnCheckedChangeListener { _, isChecked ->
             val mode = if (isChecked) "Automática" else "Manual"
-            Toast.makeText(this, "Confirmación de citas cambiada a: $mode (RF11)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Confirmación de citas cambiada a: $mode", Toast.LENGTH_SHORT).show()
         }
     }
 

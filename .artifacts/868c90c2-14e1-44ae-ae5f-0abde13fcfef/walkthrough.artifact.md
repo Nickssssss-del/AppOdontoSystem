@@ -1,40 +1,36 @@
-# Walkthrough - Implementación de Matriz de Requerimientos (RF01-RF12)
+# Formulación de Capa de Datos para Registro
 
-Se ha completado la alineación integral del proyecto con la Matriz de Requerimientos oficial. A continuación se detallan los cambios clave realizados.
+Se ha implementado la infraestructura de datos necesaria para soportar el proceso de registro de Pacientes y Odontólogos, integrando la UI de Compose con un repositorio sólido y simulación de backend.
 
 ## Cambios Realizados
 
-### 🛡️ Seguridad y Autenticación (RF01, RNF01)
-- **Token JWT con Expiración:** `SessionManager` ahora simula la expiración de tokens JWT tras 2 horas, forzando el cierre de sesión si el token es inválido.
-- **Sesión Encriptada:** Se mantiene el uso de `EncryptedSharedPreferences` para el almacenamiento de credenciales.
+### 🏗️ Modelos y Contratos (RF08)
+- **RegisterRequest:** Se ha definido el modelo de datos que agrupa la información de registro, incluyendo campos dinámicos como `copNumber` para odontólogos.
+- **ApiService:** Se añadió el endpoint `POST /auth/register` a la interfaz de Retrofit.
 
-### ⚡ Reserva Express y Geolocalización (RF02, RF03, RNF02)
-- **Flujo <4 Clics:** Optimización en `DentistAdapter` para permitir la reserva directa desde la lista de resultados al tocar un slot de tiempo.
-- **Filtrado por Distrito:** El buscador en `MainActivity` está plenamente integrado con los distritos de Ica.
+### 💾 Repositorio e Identidad
+- **AuthRepository:** Se implementó la función `register`, la cual gestiona la llamada a la API y la persistencia de la sesión en el `SessionManager`.
+- **Persistencia de Sesión:** Tras un registro exitoso (o simulado), el sistema guarda automáticamente el token, nombre y rol del usuario para permitir la navegación inmediata al Dashboard.
 
-### 📅 Historial y Regla de 12 Horas (RF04, RF05)
-- **Validación de Cancelación:** En `AppointmentStore`, se ha implementado la lógica que impide cancelar citas con menos de 12 horas de antelación, mostrando un mensaje informativo al usuario.
-- **Liberación Inmediata:** Al cancelar una cita válida, el slot vuelve a estar disponible instantáneamente para otros pacientes.
-- **Estados Visuales:** El adaptador de citas ahora diferencia visualmente entre estados: Atendida (Azul), Cancelada (Rojo), Confirmada (Verde) y Pausada (Ámbar).
+### 🧠 Lógica de Negocio y UI (Compose)
+- **LoginViewModel:** Se añadió la función `register` que maneja los estados de carga (`Loading`), éxito (`Success`) y errores (`Error`).
+- **RegisterScreen (Conexión):**
+    - El botón "Crear Cuenta" ahora invoca la lógica del repositorio.
+    - Se observa el estado de autenticación para realizar el salto automático al Dashboard correspondiente (Paciente o Odontólogo).
+    - Se incluyó manejo de errores visuales en la parte inferior del formulario.
 
-### 👨‍⚕️ Gestión del Odontólogo (RF06, RF07, RF11, RF12)
-- **Configuración de Agenda:** Se añadieron controles en el panel del odontólogo para cambiar la frecuencia de disponibilidad (Diaria/Semanal) y el modo de confirmación (Manual/Automático).
-- **Bloqueo Express:** Se mejoró el switch de emergencia para pausar turnos de hoy, con notificaciones simuladas para los pacientes afectados.
-- **Indicador de Ocupación:** La ficha del odontólogo ahora muestra una barra de progreso con el porcentaje de ocupación actual.
-
-### 📄 Registro y Validación Profesional (RF08, RF09)
-- **Nuevas Pantallas:** Se crearon `RegisterActivity` (con carga de los 4 documentos obligatorios) y `VerificationStatusActivity` (para ver el estado de aprobación: Aprobado, Observado o Rechazado).
-- **Simulación de Re-subida:** El sistema permite simular la re-carga de documentos si el estado es 'Observado'.
-
-### 📝 Documentación
-- **README.md:** Se ha reescrito completamente para incluir la matriz técnica, criterios de aceptación, arquitectura MVVM y guías de ejecución.
+### ⚡ Simulación (Mock Backend)
+- **MockApiInterceptor:** Se añadió una respuesta simulada para el endpoint de registro, garantizando que el flujo sea funcional en entornos de desarrollo sin API activa.
 
 ## Verificación
 
-### Pruebas Manuales Exitosas:
-1. **Reserva Express:** Distrito -> Slot -> Confirmar (3 clics).
-2. **Cancelación 12h:** Bloqueo de cancelación para citas del día de hoy.
-3. **Registro:** Flujo completo de carga de documentos DNI, Título, Colegiatura y CV.
-4. **Bloqueo Express:** Verificación de que los turnos de hoy desaparecen en la vista del paciente al activar el switch.
+### Compilación Exitosa
+El proyecto ha sido sincronizado y compilado satisfactoriamente, validando la integridad de los nuevos modelos y dependencias de Compose.
 
-[README.md](file:///C:/GitHub/OdontoSystemMobile/README.md)
+### Flujo de Usuario Validado
+1. **Registro:** Al completar los campos y presionar "Crear Cuenta", la app muestra el indicador de carga.
+2. **Dashboard:** Tras el registro, el sistema reconoce al nuevo usuario y lo redirige automáticamente a su pantalla principal.
+3. **Persistencia:** Si se reinicia la app (simulado), el `SessionManager` mantiene la sesión del usuario registrado.
+
+[AuthRepository.kt](file:///C:/GitHub/OdontoSystemMobile/app/src/main/java/com/odontosystem/app/repository/AuthRepository.kt)
+[RegisterScreen.kt](file:///C:/GitHub/OdontoSystemMobile/app/src/main/java/com/odontosystem/app/ui/auth/RegisterScreen.kt)

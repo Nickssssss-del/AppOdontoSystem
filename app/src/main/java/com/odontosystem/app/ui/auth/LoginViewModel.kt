@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.odontosystem.app.data.model.RegisterRequest
 import com.odontosystem.app.data.model.UserRole
 import com.odontosystem.app.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -42,6 +43,32 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
     fun loginAsDemo() {
         authRepository.loginAsDemo(currentRole)
         _loginState.value = LoginState.Success(currentRole)
+    }
+
+    fun register(
+        name: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        pass: String,
+        role: UserRole,
+        copNumber: String? = null
+    ) {
+        if (name.isBlank() || email.isBlank() || pass.isBlank()) {
+            _loginState.value = LoginState.Error("Por favor completa los campos obligatorios.")
+            return
+        }
+
+        _loginState.value = LoginState.Loading
+        viewModelScope.launch {
+            val req = RegisterRequest(name, lastName, email, phone, pass, role, copNumber)
+            val result = authRepository.register(req)
+            result.onSuccess {
+                _loginState.value = LoginState.Success(role)
+            }.onFailure {
+                _loginState.value = LoginState.Error("Error al registrar: ${it.message}")
+            }
+        }
     }
 
     sealed class LoginState {

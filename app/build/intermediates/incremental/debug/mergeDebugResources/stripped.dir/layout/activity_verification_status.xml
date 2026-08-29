@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:gravity="center"
-        android:text="Estamos validando tus documentos (DNI, Título, Colegiatura y CV). Este proceso puede tardar hasta 48 horas (RF09)."
+        android:text="Estamos validando tus documentos (DNI, Título, Colegiatura y CV). Este proceso puede tardar hasta 48 horas."
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 

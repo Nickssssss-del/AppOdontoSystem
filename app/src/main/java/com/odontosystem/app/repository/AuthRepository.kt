@@ -3,6 +3,7 @@ package com.odontosystem.app.repository
 import com.odontosystem.app.data.local.SessionManager
 import com.odontosystem.app.data.model.AuthRequest
 import com.odontosystem.app.data.model.AuthResponse
+import com.odontosystem.app.data.model.RegisterRequest
 import com.odontosystem.app.data.model.User
 import com.odontosystem.app.data.model.UserRole
 import com.odontosystem.app.data.remote.ApiService
@@ -40,6 +41,39 @@ class AuthRepository(
             } else {
                 User("dnt_501", "Dr. Roberto Mendoza", email, UserRole.DENTIST)
             }
+            Result.success(AuthResponse("demo_jwt_token", demoUser))
+        }
+    }
+
+    suspend fun register(request: RegisterRequest): Result<AuthResponse> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.register(request)
+            if (response.isSuccessful && response.body() != null) {
+                val authBody = response.body()!!
+                sessionManager.saveAuthToken(authBody.token)
+                sessionManager.saveUserEmail(authBody.user.email)
+                sessionManager.saveUserName(authBody.user.name)
+                sessionManager.saveUserRole(request.role)
+                Result.success(authBody)
+            } else {
+                // Fallback demo for successful navigation
+                val demoUser = User(
+                    id = "usr_" + System.currentTimeMillis(),
+                    name = "${request.name} ${request.lastName}",
+                    email = request.email,
+                    role = request.role
+                )
+                loginAsDemo(request.role, request.email)
+                Result.success(AuthResponse("demo_jwt_token", demoUser))
+            }
+        } catch (e: Exception) {
+            val demoUser = User(
+                id = "usr_" + System.currentTimeMillis(),
+                name = "${request.name} ${request.lastName}",
+                email = request.email,
+                role = request.role
+            )
+            loginAsDemo(request.role, request.email)
             Result.success(AuthResponse("demo_jwt_token", demoUser))
         }
     }

@@ -22,3 +22,14 @@ data class AuthResponse(
     val token: String,
     val user: User
 )
+
+data class RegisterRequest(
+    val name: String,
+    val lastName: String,
+    val email: String,
+    val phone: String,
+    val password: String,
+    val role: UserRole,
+    val copNumber: String? = null,
+    val documents: List<String>? = emptyList()
+)

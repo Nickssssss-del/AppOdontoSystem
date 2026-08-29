@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Completa tu perfil y sube los documentos para validación (RF08)."
+            android:text="Completa tu perfil y sube los documentos para validación profesional."
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
@@ -53,7 +53,7 @@
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Subida de Documentos (RF08) -->
+        <!-- Subida de Documentos -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
