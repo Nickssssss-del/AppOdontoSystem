@@ -67,6 +67,3 @@ La plataforma está preparada para la comunicación multicanal:
 4. **Ejecución:** Seleccionar emulador o dispositivo físico y presionar `Run 'app'`.
 
 ---
-**Proyecto ODS-2026-001** · UTP · Curso Integrador I.
-Docente: Ing. Ana Meliza Garayar Tito.
-Equipo: Sebastián, Luana, Nicole.
