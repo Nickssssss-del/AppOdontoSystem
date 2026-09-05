@@ -20,3 +20,4 @@ target/
 ### Sistema operativo ###
 .DS_Store
 Thumbs.db
+application.properties
