@@ -11,10 +11,12 @@ import com.odontosystem.api.repository.AppointmentRepository;
 import com.odontosystem.api.repository.DentistRepository;
 import com.odontosystem.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -50,7 +52,14 @@ public class AppointmentService {
         Dentist dentist = dentistRepository.findById(request.getDentistId())
                 .orElseThrow(() -> ApiException.notFound("Odontólogo no encontrado"));
 
-        LocalDate date = LocalDate.parse(request.getDate());
+        LocalDate date;
+        try {
+            date = LocalDate.parse(request.getDate());
+        } catch (DateTimeParseException e) {
+            throw ApiException.badRequest(
+                    "Formato de fecha inválido. Usa el formato AAAA-MM-DD, por ejemplo: 2026-09-15.");
+        }
+
         if (date.isBefore(LocalDate.now())) {
             throw ApiException.badRequest("No es posible reservar una cita en una fecha pasada");
         }
@@ -64,7 +73,15 @@ public class AppointmentService {
                 .status(AppointmentStatus.Pendiente)
                 .build();
 
-        appointmentRepository.save(appointment);
+        try {
+            appointmentRepository.save(appointment);
+            appointmentRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            // Disparado por la restricción única `uq_appointment_slot` (V2__improve_schema.sql):
+            // mismo odontólogo + misma fecha + misma hora ya reservados por otro paciente.
+            throw ApiException.conflict("Ese horario ya fue reservado por otro paciente. Elige otro horario.");
+        }
+
         return toDto(appointment);
     }
 
