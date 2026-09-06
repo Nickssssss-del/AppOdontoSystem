@@ -43,7 +43,7 @@ public class AuthDtos {
         private String phone;
     }
 
-    /** Espejo exacto de `AuthResponse` en AuthModels.kt */
+    /** Espejo exacto de `AuthResponse` en AuthModels.kt, ahora incluye refreshToken */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -51,6 +51,36 @@ public class AuthDtos {
     @Builder
     public static class AuthResponse {
         private String token;
+        private String refreshToken;
         private UserDto user;
+    }
+
+    /** Body de POST /api/v1/auth/register */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RegisterRequest {
+        @NotBlank
+        private String name;
+
+        @NotBlank
+        @Email
+        private String email;
+
+        @NotBlank
+        private String password;
+
+        private UserRole role = UserRole.PATIENT;
+    }
+
+    /** Body de POST /api/v1/auth/refresh */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefreshRequest {
+        @NotBlank
+        private String refreshToken;
     }
 }
