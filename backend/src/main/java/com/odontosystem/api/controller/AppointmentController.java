@@ -11,11 +11,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Rutas protegidas (requieren JWT):
- *  - GET  /api/v1/appointments/my-appointments
- *  - POST /api/v1/appointments
+ *  - GET   /api/v1/appointments/my-appointments
+ *  - POST  /api/v1/appointments
+ *  - PATCH /api/v1/appointments/{id}/cancel
  * Consumidas por AppointmentListViewModel / BookAppointmentViewModel en el cliente Android.
  */
 @RestController
@@ -38,5 +40,14 @@ public class AppointmentController {
         String email = authentication.getName();
         AppointmentDto created = appointmentService.create(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<AppointmentDto> cancel(
+            Authentication authentication,
+            @PathVariable UUID id) {
+        String email = authentication.getName();
+        AppointmentDto cancelled = appointmentService.cancel(email, id);
+        return ResponseEntity.ok(cancelled);
     }
 }

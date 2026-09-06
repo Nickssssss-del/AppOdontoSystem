@@ -85,6 +85,27 @@ public class AppointmentService {
         return toDto(appointment);
     }
 
+    @Transactional
+    public AppointmentDto cancel(String patientEmail, java.util.UUID appointmentId) {
+        User patient = userRepository.findByEmail(patientEmail)
+                .orElseThrow(() -> ApiException.notFound("Usuario no encontrado"));
+
+        Appointment appointment = appointmentRepository.findByIdAndPatientId(appointmentId, patient.getId())
+                .orElseThrow(() -> ApiException.notFound("Cita no encontrada"));
+
+        if (appointment.getStatus() == AppointmentStatus.Cancelada) {
+            throw ApiException.conflict("Esta cita ya estaba cancelada");
+        }
+        if (appointment.getStatus() == AppointmentStatus.Completada) {
+            throw ApiException.conflict("No se puede cancelar una cita ya completada");
+        }
+
+        appointment.setStatus(AppointmentStatus.Cancelada);
+        appointmentRepository.save(appointment);
+
+        return toDto(appointment);
+    }
+
     private AppointmentDto toDto(Appointment a) {
         return AppointmentDto.builder()
                 .id(a.getId())
