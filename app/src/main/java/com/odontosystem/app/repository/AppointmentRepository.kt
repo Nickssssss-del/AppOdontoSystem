@@ -6,6 +6,7 @@ import com.odontosystem.app.data.model.CreateAppointmentRequest
 import com.odontosystem.app.data.remote.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class AppointmentRepository(private val apiService: ApiService) {
 
@@ -19,7 +20,7 @@ class AppointmentRepository(private val apiService: ApiService) {
             }
             Result.success(AppointmentStore.merge(remote))
         } catch (e: Exception) {
-            Result.success(AppointmentStore.merge(emptyList()))
+            Result.failure(e)
         }
     }
 
@@ -32,39 +33,21 @@ class AppointmentRepository(private val apiService: ApiService) {
         time: String,
         reason: String?
     ): Result<Appointment> = withContext(Dispatchers.IO) {
-        val fallback = Appointment(
-            id = "apt_" + System.currentTimeMillis(),
-            dentistId = dentistId,
-            dentistName = dentistName,
-            specialty = specialty,
-            district = district,
-            date = date,
-            time = time,
-            reason = reason ?: "Reserva express",
-            status = "Confirmada"
-        )
         try {
             val req = CreateAppointmentRequest(dentistId, date, time, reason)
             val response = apiService.createAppointment(req)
-            val created = if (response.isSuccessful && response.body() != null) {
-                response.body()!!.copy(
-                    dentistId = dentistId,
-                    dentistName = dentistName,
-                    specialty = specialty,
-                    district = district,
-                    date = date,
-                    time = time,
-                    reason = reason ?: "Reserva express",
-                    status = "Confirmada"
-                )
+            if (response.isSuccessful && response.body() != null) {
+                val created = response.body()!!
+                AppointmentStore.add(created)
+                Result.success(created)
+            } else if (response.code() == 409) {
+                // Concurrencia: el turno ya fue reservado (uq_appointment_slot)
+                Result.failure(Exception("Ese horario ya fue reservado por otro paciente. Elige otro turno."))
             } else {
-                fallback
+                Result.failure(Exception(errorMessage(response)))
             }
-            AppointmentStore.add(created)
-            Result.success(created)
         } catch (e: Exception) {
-            AppointmentStore.add(fallback)
-            Result.success(fallback)
+            Result.failure(e)
         }
     }
 
@@ -75,5 +58,14 @@ class AppointmentRepository(private val apiService: ApiService) {
 
     fun activateExpressBlock(dentistId: String) {
         AppointmentStore.activateExpressBlock(dentistId)
+    }
+
+    private fun errorMessage(response: Response<*>): String {
+        return response.errorBody()?.string()?.let { body ->
+            Regex("\"message\"\\s*:\\s*\"([^\"]+)\"")
+                .find(body)
+                ?.groupValues
+                ?.getOrNull(1)
+        } ?: "Error del servidor (${response.code()})."
     }
 }

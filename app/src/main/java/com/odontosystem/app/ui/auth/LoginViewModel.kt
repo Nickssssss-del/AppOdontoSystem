@@ -33,9 +33,8 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
             val result = authRepository.login(email, pass, currentRole)
             result.onSuccess {
                 _loginState.value = LoginState.Success(currentRole)
-            }.onFailure {
-                authRepository.loginAsDemo(currentRole, email)
-                _loginState.value = LoginState.Success(currentRole)
+            }.onFailure { e ->
+                _loginState.value = LoginState.Error(e.message ?: "No se pudo iniciar sesión")
             }
         }
     }

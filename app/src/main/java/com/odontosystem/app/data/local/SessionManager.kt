@@ -30,6 +30,14 @@ class SessionManager(context: Context) {
         prefs.edit().putLong(KEY_TOKEN_TIMESTAMP, System.currentTimeMillis()).apply()
     }
 
+    fun saveRefreshToken(token: String?) {
+        prefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
+    fun fetchRefreshToken(): String? {
+        return prefs.getString(KEY_REFRESH_TOKEN, null)
+    }
+
     fun isTokenExpired(): Boolean {
         val timestamp = prefs.getLong(KEY_TOKEN_TIMESTAMP, 0L)
         if (timestamp == 0L) return true
@@ -90,5 +98,6 @@ class SessionManager(context: Context) {
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"
         private const val KEY_TOKEN_TIMESTAMP = "token_timestamp"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
     }
 }

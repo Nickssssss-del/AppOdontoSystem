@@ -20,6 +20,7 @@ data class AuthRequest(
 
 data class AuthResponse(
     val token: String,
+    val refreshToken: String? = null,
     val user: User
 )
 

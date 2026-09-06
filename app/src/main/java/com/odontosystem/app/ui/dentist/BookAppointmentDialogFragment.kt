@@ -90,8 +90,8 @@ class BookAppointmentDialogFragment : DialogFragment() {
                     Toast.makeText(requireContext(), "Reserva confirmada: ${parts.first} · ${parts.second}", Toast.LENGTH_LONG).show()
                     onAppointmentCreated?.invoke()
                     dismiss()
-                }.onFailure {
-                    Toast.makeText(requireContext(), "No se pudo confirmar la reserva", Toast.LENGTH_SHORT).show()
+                }.onFailure { e ->
+                    Toast.makeText(requireContext(), e.message ?: "No se pudo confirmar la reserva", Toast.LENGTH_LONG).show()
                     binding.btnConfirm.isEnabled = true
                 }
             }
