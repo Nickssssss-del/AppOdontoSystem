@@ -67,4 +67,14 @@ public class Dentist {
     @Column(name = "avatar_initials", length = 5)
     @Builder.Default
     private String avatarInitials = "DR";
+
+    /**
+     * Cuenta de usuario (rol DENTIST) vinculada a este perfil. Es
+     * opcional: los odontólogos sembrados en V1 no tienen cuenta real
+     * hasta que se vinculen manualmente o mediante un flujo de
+     * "reclamar perfil" (ver V4__link_dentist_user.sql).
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
 }
