@@ -1,4 +1,6 @@
-# OdontoSystemMobile — Matriz de Requerimientos Oficial (RF01-RF12)
+# OdontoSystemMobile — Entrega ABP
+
+Repositorio oficial del proyecto móvil OdontoSystem. La rúbrica vigente para la entrega es **Taller ABP - Entrega 1: Proyecto, Presentación y Repositorio en GitHub (20%)**. La matriz RF01-RF12 de este documento define el alcance funcional del producto.
 
 Plataforma móvil integral para la gestión de citas odontológicas en la provincia de **Ica**, optimizada para conectar pacientes con odontólogos independientes mediante un sistema de reserva express y validación profesional rigurosa.
 
@@ -66,7 +68,86 @@ La plataforma está preparada para la comunicación multicanal:
 3. **Compilación:** `Build -> Make Project`.
 4. **Ejecución:** Seleccionar emulador o dispositivo físico y presionar `Run 'app'`.
 
+### Módulo Android oficial
+
+El proyecto Android que debe abrirse y entregarse es el módulo raíz `app/`. Está declarado por el [settings.gradle](settings.gradle) mediante `include(":app")`. La carpeta `OdontoSystemMobile/` conserva una copia histórica del módulo y no debe usarse como proyecto principal.
+
+Para conectar el emulador con el backend local, cambia `BASE_URL` en `app/src/main/java/com/odontosystem/app/data/remote/RetrofitClient.kt` a:
+
+```text
+http://10.0.2.2:8080/
+```
+
+Para un teléfono físico, usa la IP local de la computadora. Para producción, usa la URL pública del backend desplegado.
+
+## 6. Arquitectura de la solución
+
+La aplicación móvil usa MVVM y repositorios. El backend expone una API REST versionada, valida JWT y centraliza la lógica de negocio en servicios. PostgreSQL en Supabase almacena la información y Flyway versiona el esquema.
+
+```mermaid
+flowchart LR
+	Mobile[Android app\nKotlin + MVVM] -->|Retrofit + JWT| Api[Spring Boot REST API\nControllers]
+	Api --> Security[Spring Security\nJWT + RBAC]
+	Api --> Services[Services\nReglas de negocio]
+	Services --> Repositories[JPA Repositories]
+	Repositories --> Database[(PostgreSQL\nSupabase)]
+	Migrations[Flyway migrations] --> Database
+```
+
+### Capas principales
+
+- **Android:** UI, ViewModel, Repository, Retrofit y almacenamiento seguro de sesión.
+- **Backend:** `controller`, `service`, `repository`, `entity`, `dto`, `security` y `exception`.
+- **Seguridad:** JWT con refresh token y roles `PATIENT`, `DENTIST` y `ADMIN`.
+- **Persistencia:** PostgreSQL/Supabase con migraciones Flyway reproducibles.
+
+## 7. Backend y API
+
+El backend está en [`backend/`](backend/README.md) y se ejecuta en `http://localhost:8080`. La documentación interactiva queda disponible en:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+Incluye autenticación, odontólogos, citas, pagos, reseñas, chatbot, historias clínicas, odontograma, administración y auditoría.
+
+## 8. Despliegue
+
+### Backend
+
+1. Crear un Web Service en Render o Railway conectado al repositorio.
+2. Usar Java 17 y ejecutar `mvn clean package -DskipTests`.
+3. Iniciar con `java -jar target/odontosystem-api-1.0.0.jar`.
+4. Configurar `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` y `JWT_SECRET` como variables privadas.
+
+### Android
+
+Actualizar `BASE_URL` con la URL pública del backend y generar el APK o AAB desde Android Studio.
+
+## 9. Verificación de entrega
+
+- Backend conectado a Supabase y migraciones Flyway ejecutadas.
+- API documentada en Swagger/OpenAPI.
+- Autenticación JWT y autorización por roles.
+- Módulo Android oficial definido como `app/`.
+- Variables sensibles excluidas del repositorio mediante `.gitignore`.
+
 ---
-**Proyecto ODS-2026-001** · UTP · Curso Integrador I.
-Docente: Ing. Ana Meliza Garayar Tito.
-Equipo: Sebastián, Luana, Nicole.
+
+## Información académica
+
+**Curso:** DISEÑO DE APLICACIONES PARA MÓVILES_B1A_27106590_20262
+
+**Docente:** Feibert Alirio Guzmán Pérez
+
+- Doctorando en Administración Gerencial.
+- Maestrando en Visual Analytics and Big Data.
+- Magíster en Educación.
+- Especialista en Big Data e Inteligencia Artificial.
+- Especialista en Gerencia Informática.
+- Ingeniero de Sistemas.
+
+**Integrantes:**
+
+- Nicole De la Cruz
+- Luana Barrientos Espinoza

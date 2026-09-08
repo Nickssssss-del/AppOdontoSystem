@@ -3,8 +3,7 @@
 Backend REST para la aplicación móvil Android **OdontoSystem**, correspondiente
 al Taller ABP — Entrega 1 (Diseño de Aplicaciones Móviles, FUCN).
 
-Implementa exactamente los 5 endpoints que ya consume el cliente Android
-(`ApiService.kt`), usando **Spring Boot 3**, **Spring Security + JWT**,
+Implementa la API REST que consume el cliente Android (`ApiService.kt`), usando **Spring Boot 3**, **Spring Security + JWT**,
 **Spring Data JPA** y **PostgreSQL (Supabase)**.
 
 ## 1. Requisitos previos
@@ -61,10 +60,11 @@ JWT_SECRET=una_clave_larga_y_aleatoria
 mvn spring-boot:run
 ```
 
-Al arrancar, **Flyway ejecuta automáticamente** la migración
-`V1__init_schema.sql`, que crea las tablas `users`, `dentists`,
-`appointments` y las llena con datos de prueba (3 odontólogos y 1
-paciente demo: `paciente@demo.com` / contraseña `123456`).
+Al arrancar, **Flyway ejecuta automáticamente** las migraciones versionadas
+`V1__init_schema.sql` hasta la última versión disponible. Estas crean el
+esquema de usuarios, odontólogos, citas, pagos, historias clínicas,
+odontograma, auditoría y datos de prueba (3 odontólogos y 1 paciente demo:
+`paciente@demo.com` / contraseña `123456`).
 
 Si todo va bien, verás en la consola:
 ```
@@ -123,7 +123,22 @@ Content-Type: application/json
 }
 ```
 
-## 7. Conectar la app Android
+## 7. Arquitectura
+
+```mermaid
+flowchart TB
+  Controller[Controllers REST] --> Service[Services]
+  Service --> Repository[JPA Repositories]
+  Repository --> PostgreSQL[(PostgreSQL / Supabase)]
+  Security[JWT filter + RBAC] --> Controller
+  Flyway[Flyway migrations] --> PostgreSQL
+```
+
+Los controladores reciben DTOs validados, los servicios aplican las reglas de
+negocio, los repositorios encapsulan el acceso a datos y Spring Security
+protege las rutas mediante JWT y los roles `PATIENT`, `DENTIST` y `ADMIN`.
+
+## 8. Conectar la app Android
 
 En el cliente Android, revisa `RetrofitClient.kt` y cambia la URL base
 de `https://odontosystem-api.onrender.com/` a la URL de tu backend:
@@ -135,7 +150,7 @@ de `https://odontosystem-api.onrender.com/` a la URL de tu backend:
 - En producción (una vez desplegado en Render): la URL pública que te
   asigne Render.
 
-## 8. Desplegar en Render (producción)
+## 9. Desplegar en Render (producción)
 
 1. Sube esta carpeta `odontosystem-api` a tu repositorio de GitHub
    (dentro de `/backend`, como se documentó en el informe del proyecto).
@@ -147,7 +162,7 @@ de `https://odontosystem-api.onrender.com/` a la URL de tu backend:
 4. Agrega las mismas variables de entorno del paso 4 en la sección
    *Environment* de Render.
 
-## 9. Estructura del proyecto
+## 10. Estructura del proyecto
 
 ```
 odontosystem-api/
@@ -166,10 +181,8 @@ odontosystem-api/
 └── pom.xml
 ```
 
-## 10. Próximos pasos sugeridos (Sprint 2)
+## 11. Estado y límites conocidos
 
-- Agregar endpoint de registro de pacientes (`POST /api/v1/auth/register`).
-- Agregar endpoint para cancelar/reprogramar citas.
-- Sustituir el `ChatbotService` basado en reglas por integración con un
-  servicio de PLN (ver sección 7 del documento técnico del proyecto).
-- Escribir pruebas unitarias con Mockito para la capa `service`.
+- El chatbot actual usa reglas locales; una integración con PLN sería una mejora futura.
+- El pago implementado es de demostración y no procesa tarjetas reales.
+- Antes de desplegar, sustituye cualquier URL local por la URL pública del backend y configura `CORS_ORIGINS`.
