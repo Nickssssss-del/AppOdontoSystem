@@ -45,6 +45,29 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
         _loginState.value = LoginState.Success(currentRole)
     }
 
+    fun loginWithGoogle(idToken: String) {
+        if (idToken.isBlank()) {
+            _loginState.value = LoginState.Error("No se recibió un token válido de Google.")
+            return
+        }
+
+        _loginState.value = LoginState.Loading
+        viewModelScope.launch {
+            val result = authRepository.loginWithGoogle(idToken, currentRole)
+            result.onSuccess {
+                _loginState.value = LoginState.Success(currentRole)
+            }.onFailure {
+                val message = it.message?.takeIf { msg -> msg.isNotBlank() }
+                    ?: "No se pudo iniciar sesión con Google."
+                _loginState.value = LoginState.Error(message)
+            }
+        }
+
+        fun showAuthError(message: String) {
+            _loginState.value = LoginState.Error(message)
+        }
+    }
+
     fun register(
         name: String,
         lastName: String,

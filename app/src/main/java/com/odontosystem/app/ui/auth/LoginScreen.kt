@@ -34,7 +34,8 @@ import com.odontosystem.app.data.model.UserRole
 fun LoginScreen(
     viewModel: LoginViewModel,
     onNavigateToRegister: () -> Unit,
-    onLoginSuccess: (UserRole) -> Unit
+    onLoginSuccess: (UserRole) -> Unit,
+    onGoogleSignInClick: () -> Unit
 ) {
     val loginState by viewModel.loginState.observeAsState()
     var email by remember { mutableStateOf("nicole@odontosystem.com") }
@@ -216,6 +217,20 @@ fun LoginScreen(
                         border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = R.color.primary))
                     ) {
                         Text("Entrar como Demo", fontSize = 14.sp)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = onGoogleSignInClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = R.color.primary)),
+                        enabled = loginState !is LoginViewModel.LoginState.Loading
+                    ) {
+                        Text("Continuar con Google", fontSize = 14.sp)
                     }
 
                     if (loginState is LoginViewModel.LoginState.Error) {

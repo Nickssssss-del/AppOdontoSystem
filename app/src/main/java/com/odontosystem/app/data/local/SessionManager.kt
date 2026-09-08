@@ -30,6 +30,10 @@ class SessionManager(context: Context) {
         prefs.edit().putLong(KEY_TOKEN_TIMESTAMP, System.currentTimeMillis()).apply()
     }
 
+    fun saveRefreshToken(refreshToken: String) {
+        prefs.edit().putString(KEY_REFRESH_TOKEN, refreshToken).apply()
+    }
+
     fun isTokenExpired(): Boolean {
         val timestamp = prefs.getLong(KEY_TOKEN_TIMESTAMP, 0L)
         if (timestamp == 0L) return true
@@ -44,6 +48,10 @@ class SessionManager(context: Context) {
             return null
         }
         return prefs.getString(KEY_JWT_TOKEN, null)
+    }
+
+    fun fetchRefreshToken(): String? {
+        return prefs.getString(KEY_REFRESH_TOKEN, null)
     }
 
     fun saveUserEmail(email: String) {
@@ -86,6 +94,7 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREF_NAME = "encrypted_session_prefs"
         private const val KEY_JWT_TOKEN = "jwt_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"

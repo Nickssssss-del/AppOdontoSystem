@@ -3,6 +3,7 @@ package com.odontosystem.app.repository
 import com.odontosystem.app.data.local.SessionManager
 import com.odontosystem.app.data.model.AuthRequest
 import com.odontosystem.app.data.model.AuthResponse
+import com.odontosystem.app.data.model.GoogleAuthRequest
 import com.odontosystem.app.data.model.RegisterRequest
 import com.odontosystem.app.data.model.User
 import com.odontosystem.app.data.model.UserRole
@@ -20,10 +21,7 @@ class AuthRepository(
             val response = apiService.login(AuthRequest(email, pass, role))
             if (response.isSuccessful && response.body() != null) {
                 val authBody = response.body()!!
-                sessionManager.saveAuthToken(authBody.token)
-                sessionManager.saveUserEmail(authBody.user.email)
-                sessionManager.saveUserName(authBody.user.name)
-                sessionManager.saveUserRole(role)
+                persistAuthSession(authBody, role)
                 Result.success(authBody)
             } else {
                 loginAsDemo(role, email)
@@ -50,10 +48,7 @@ class AuthRepository(
             val response = apiService.register(request)
             if (response.isSuccessful && response.body() != null) {
                 val authBody = response.body()!!
-                sessionManager.saveAuthToken(authBody.token)
-                sessionManager.saveUserEmail(authBody.user.email)
-                sessionManager.saveUserName(authBody.user.name)
-                sessionManager.saveUserRole(request.role)
+                persistAuthSession(authBody, request.role)
                 Result.success(authBody)
             } else {
                 // Fallback demo for successful navigation
@@ -78,6 +73,26 @@ class AuthRepository(
         }
     }
 
+    suspend fun loginWithGoogle(idToken: String, role: UserRole): Result<AuthResponse> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.loginWithGoogle(GoogleAuthRequest(idToken, role))
+            if (response.isSuccessful && response.body() != null) {
+                val authBody = response.body()!!
+                persistAuthSession(authBody, role)
+                Result.success(authBody)
+            } else {
+                val errorBody = response.errorBody()?.string().orEmpty()
+                Result.failure(
+                    IllegalArgumentException(
+                        if (errorBody.isNotBlank()) errorBody else "No se pudo validar el token de Google."
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun loginAsDemo(role: UserRole, customEmail: String? = null): Boolean {
         sessionManager.saveAuthToken("demo_jwt_token")
         sessionManager.saveUserRole(role)
@@ -97,4 +112,12 @@ class AuthRepository(
 
     fun isLoggedIn(): Boolean = sessionManager.isLoggedIn()
     fun getUserRole(): UserRole = sessionManager.fetchUserRole()
+
+    private fun persistAuthSession(authBody: AuthResponse, role: UserRole) {
+        sessionManager.saveAuthToken(authBody.token)
+        authBody.refreshToken?.let { sessionManager.saveRefreshToken(it) }
+        sessionManager.saveUserEmail(authBody.user.email)
+        sessionManager.saveUserName(authBody.user.name)
+        sessionManager.saveUserRole(role)
+    }
 }

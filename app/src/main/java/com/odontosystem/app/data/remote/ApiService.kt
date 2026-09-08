@@ -16,6 +16,11 @@ interface ApiService {
         @Body request: RegisterRequest
     ): Response<AuthResponse>
 
+    @POST("api/v1/auth/google")
+    suspend fun loginWithGoogle(
+        @Body request: GoogleAuthRequest
+    ): Response<AuthResponse>
+
     @GET("api/v1/dentists")
     suspend fun getDentists(
         @Query("district") district: String? = null,

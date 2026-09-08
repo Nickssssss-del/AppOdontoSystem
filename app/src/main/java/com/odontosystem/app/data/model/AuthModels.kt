@@ -20,7 +20,13 @@ data class AuthRequest(
 
 data class AuthResponse(
     val token: String,
+    val refreshToken: String? = null,
     val user: User
+)
+
+data class GoogleAuthRequest(
+    val idToken: String,
+    val role: UserRole
 )
 
 data class RegisterRequest(
