@@ -20,8 +20,8 @@ data class AuthRequest(
 
 data class AuthResponse(
     val token: String,
-    val refreshToken: String? = null,
-    val user: User
+    val user: User,
+    val refreshToken: String? = null
 )
 
 data class GoogleAuthRequest(

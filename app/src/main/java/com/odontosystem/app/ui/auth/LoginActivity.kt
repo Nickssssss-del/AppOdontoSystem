@@ -8,9 +8,6 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -92,16 +89,20 @@ class LoginActivity : ComponentActivity() {
             val request = buildGoogleCredentialRequest()
             try {
                 val result = credentialManager.getCredential(
-                    context = this@LoginActivity,
-                    request = request
+                    this@LoginActivity,
+                    request
                 )
                 handleGoogleCredential(result)
-            } catch (e: GetCredentialCancellationException) {
-                viewModel.showAuthError("Inicio de sesión con Google cancelado por el usuario.")
-            } catch (e: NoCredentialException) {
-                viewModel.showAuthError("No hay cuentas de Google disponibles en este dispositivo.")
-            } catch (e: GetCredentialException) {
-                viewModel.showAuthError("No se pudo completar Google Sign-In. Inténtalo nuevamente.")
+            } catch (e: Exception) {
+                val className = e::class.java.simpleName
+                when {
+                    className.contains("Cancellation", ignoreCase = true) ->
+                        viewModel.showAuthError("Inicio de sesión con Google cancelado por el usuario.")
+                    className.contains("NoCredential", ignoreCase = true) ->
+                        viewModel.showAuthError("No hay cuentas de Google disponibles en este dispositivo.")
+                    else ->
+                        viewModel.showAuthError("No se pudo completar Google Sign-In. Inténtalo nuevamente.")
+                }
             }
         }
     }
