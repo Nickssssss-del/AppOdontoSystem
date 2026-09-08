@@ -2,6 +2,7 @@ package com.odontosystem.api.service;
 
 import com.odontosystem.api.dto.AppointmentDtos.AppointmentDto;
 import com.odontosystem.api.dto.AppointmentDtos.CreateAppointmentRequest;
+import com.odontosystem.api.dto.AppointmentDtos.RescheduleAppointmentRequest;
 import com.odontosystem.api.entity.Appointment;
 import com.odontosystem.api.entity.AppointmentStatus;
 import com.odontosystem.api.entity.Dentist;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
@@ -62,6 +64,7 @@ public class AppointmentService {
                 .orElseThrow(() -> ApiException.notFound("Odontólogo no encontrado"));
 
         LocalDate date;
+        LocalTime time = parseTime(request.getTime());
         try {
             date = LocalDate.parse(request.getDate());
         } catch (DateTimeParseException e) {
@@ -72,12 +75,13 @@ public class AppointmentService {
         if (date.isBefore(LocalDate.now())) {
             throw ApiException.badRequest("No es posible reservar una cita en una fecha pasada");
         }
+        ensureAvailableSchedule(dentist.getId(), date, time);
 
         Appointment appointment = Appointment.builder()
                 .patient(patient)
                 .dentist(dentist)
                 .date(date)
-                .time(request.getTime())
+                .time(time.toString())
                 .reason(request.getReason())
                 .status(AppointmentStatus.Pendiente)
                 .build();
@@ -110,6 +114,41 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.Cancelada);
         appointmentRepository.save(appointment);
 
+        return toDto(appointment);
+    }
+
+    @Transactional
+    public AppointmentDto reschedule(String email, UUID appointmentId, RescheduleAppointmentRequest request) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> ApiException.notFound("Cita no encontrada"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> ApiException.notFound("Usuario no encontrado"));
+        boolean patientOwner = appointment.getPatient().getId().equals(user.getId());
+        boolean dentistOwner = dentistRepository.findByUserId(user.getId())
+                .map(dentist -> dentist.getId().equals(appointment.getDentist().getId()))
+                .orElse(false);
+        if (!patientOwner && !dentistOwner) {
+            throw ApiException.notFound("Cita no encontrada");
+        }
+        if (appointment.getStatus() == AppointmentStatus.Cancelada
+                || appointment.getStatus() == AppointmentStatus.Completada) {
+            throw ApiException.conflict("Esta cita no se puede reagendar");
+        }
+
+        LocalDate date = parseDate(request.getDate());
+        LocalTime time = parseTime(request.getTime());
+        if (date.isBefore(LocalDate.now())) {
+            throw ApiException.badRequest("No es posible reagendar una cita en una fecha pasada");
+        }
+        ensureAvailableSchedule(appointment.getDentist().getId(), date, time);
+        appointment.setDate(date);
+        appointment.setTime(time.toString());
+        appointment.setStatus(AppointmentStatus.Pendiente);
+        try {
+            appointmentRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw ApiException.conflict("Ese horario ya fue reservado por otro paciente. Elige otro horario.");
+        }
         return toDto(appointment);
     }
 
@@ -146,13 +185,46 @@ public class AppointmentService {
         Dentist dentist = resolveDentistProfile(dentistEmail);
         Appointment appointment = findOwnAppointmentOrThrow(dentist.getId(), appointmentId);
 
-        if (appointment.getStatus() != AppointmentStatus.Confirmada) {
-            throw ApiException.conflict("Solo se pueden completar citas que ya estén Confirmadas");
+        if (appointment.getStatus() != AppointmentStatus.EnAtencion) {
+            throw ApiException.conflict("Solo se pueden completar citas que estén En Atención");
         }
 
         appointment.setStatus(AppointmentStatus.Completada);
         appointmentRepository.save(appointment);
         return toDto(appointment);
+    }
+
+    @Transactional
+    public AppointmentDto startAttention(String dentistEmail, UUID appointmentId) {
+        Dentist dentist = resolveDentistProfile(dentistEmail);
+        Appointment appointment = findOwnAppointmentOrThrow(dentist.getId(), appointmentId);
+        if (appointment.getStatus() != AppointmentStatus.Confirmada) {
+            throw ApiException.conflict("Solo se pueden iniciar citas Confirmadas");
+        }
+        appointment.setStatus(AppointmentStatus.EnAtencion);
+        return toDto(appointmentRepository.save(appointment));
+    }
+
+    private LocalDate parseDate(String value) {
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException e) {
+            throw ApiException.badRequest("Formato de fecha inválido. Usa el formato AAAA-MM-DD");
+        }
+    }
+
+    private LocalTime parseTime(String value) {
+        try {
+            return LocalTime.parse(value);
+        } catch (DateTimeParseException e) {
+            throw ApiException.badRequest("Formato de hora inválido. Usa HH:mm");
+        }
+    }
+
+    private void ensureAvailableSchedule(UUID dentistId, LocalDate date, LocalTime time) {
+        if (!appointmentRepository.existsAvailableSchedule(dentistId, date, time)) {
+            throw ApiException.badRequest("El horario elegido no está disponible en la agenda del odontólogo");
+        }
     }
 
     private Dentist resolveDentistProfile(String email) {

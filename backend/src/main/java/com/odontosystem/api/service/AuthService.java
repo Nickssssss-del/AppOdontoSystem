@@ -9,6 +9,7 @@ import com.odontosystem.api.dto.AuthDtos.RegisterRequest;
 import com.odontosystem.api.dto.AuthDtos.UserDto;
 import com.odontosystem.api.entity.RefreshToken;
 import com.odontosystem.api.entity.User;
+import com.odontosystem.api.entity.UserRole;
 import com.odontosystem.api.exception.ApiException;
 import com.odontosystem.api.repository.RefreshTokenRepository;
 import com.odontosystem.api.repository.UserRepository;
@@ -87,7 +88,7 @@ public class AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(UserRole.PATIENT)
                 .build();
 
         userRepository.save(user);
@@ -142,7 +143,7 @@ public class AuthService {
                             .name(googleUser.name())
                             .email(googleUser.email())
                             .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString()))
-                            .role(request.getRole())
+                            .role(UserRole.PATIENT)
                             .build();
                     return userRepository.save(created);
                 });

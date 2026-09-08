@@ -47,4 +47,16 @@ public class AppointmentDtos {
 
         private String reason;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RescheduleAppointmentRequest {
+        @NotBlank
+        private String date;
+
+        @NotBlank
+        private String time;
+    }
 }

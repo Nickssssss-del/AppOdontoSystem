@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     name          VARCHAR(150)        NOT NULL,
     email         VARCHAR(150)        NOT NULL UNIQUE,
     password_hash VARCHAR(255)        NOT NULL,
-    role          VARCHAR(20)         NOT NULL DEFAULT 'PATIENT' CHECK (role IN ('PATIENT', 'DENTIST')),
+    role          VARCHAR(20)         NOT NULL DEFAULT 'PATIENT' CHECK (role IN ('PATIENT', 'DENTIST', 'ADMIN')),
     phone         VARCHAR(20)         DEFAULT '+51987654321',
     created_at    TIMESTAMP           NOT NULL DEFAULT now()
 );

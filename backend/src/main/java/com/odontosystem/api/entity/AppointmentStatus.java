@@ -7,6 +7,7 @@ package com.odontosystem.api.entity;
 public enum AppointmentStatus {
     Confirmada,
     Pendiente,
+    EnAtencion,
     Cancelada,
     Completada
 }
