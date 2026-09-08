@@ -18,12 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Lógica de negocio del módulo de citas.
- * Corresponde a los endpoints:
- *  - GET  /api/v1/appointments/my-appointments (AppointmentListViewModel)
- *  - POST /api/v1/appointments                 (BookAppointmentViewModel)
+ * Lado paciente:
+ *  - GET   /api/v1/appointments/my-appointments
+ *  - POST  /api/v1/appointments
+ *  - PATCH /api/v1/appointments/{id}/cancel
+ * Lado odontólogo (requiere que el usuario esté vinculado a un
+ * perfil de Dentist, ver V4__link_dentist_user.sql):
+ *  - GET   /api/v1/appointments/dentist/my-appointments
+ *  - PATCH /api/v1/appointments/{id}/confirm
+ *  - PATCH /api/v1/appointments/{id}/complete
  */
 @Service
 @RequiredArgsConstructor
@@ -32,6 +39,8 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DentistRepository dentistRepository;
     private final UserRepository userRepository;
+
+    // ---------- Lado paciente ----------
 
     @Transactional(readOnly = true)
     public List<AppointmentDto> findMyAppointments(String patientEmail) {
@@ -77,8 +86,6 @@ public class AppointmentService {
             appointmentRepository.save(appointment);
             appointmentRepository.flush();
         } catch (DataIntegrityViolationException e) {
-            // Disparado por la restricción única `uq_appointment_slot` (V2__improve_schema.sql):
-            // mismo odontólogo + misma fecha + misma hora ya reservados por otro paciente.
             throw ApiException.conflict("Ese horario ya fue reservado por otro paciente. Elige otro horario.");
         }
 
@@ -86,7 +93,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentDto cancel(String patientEmail, java.util.UUID appointmentId) {
+    public AppointmentDto cancel(String patientEmail, UUID appointmentId) {
         User patient = userRepository.findByEmail(patientEmail)
                 .orElseThrow(() -> ApiException.notFound("Usuario no encontrado"));
 
@@ -104,6 +111,62 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
 
         return toDto(appointment);
+    }
+
+    // ---------- Lado odontólogo ----------
+
+    @Transactional(readOnly = true)
+    public List<AppointmentDto> findMyAppointmentsAsDentist(String dentistEmail) {
+        Dentist dentist = resolveDentistProfile(dentistEmail);
+
+        return appointmentRepository.findByDentistIdOrderByDateDescTimeDesc(dentist.getId())
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    /** Pendiente -> Confirmada */
+    @Transactional
+    public AppointmentDto confirm(String dentistEmail, UUID appointmentId) {
+        Dentist dentist = resolveDentistProfile(dentistEmail);
+        Appointment appointment = findOwnAppointmentOrThrow(dentist.getId(), appointmentId);
+
+        if (appointment.getStatus() != AppointmentStatus.Pendiente) {
+            throw ApiException.conflict("Solo se pueden confirmar citas en estado Pendiente");
+        }
+
+        appointment.setStatus(AppointmentStatus.Confirmada);
+        appointmentRepository.save(appointment);
+        return toDto(appointment);
+    }
+
+    /** Confirmada -> Completada */
+    @Transactional
+    public AppointmentDto complete(String dentistEmail, UUID appointmentId) {
+        Dentist dentist = resolveDentistProfile(dentistEmail);
+        Appointment appointment = findOwnAppointmentOrThrow(dentist.getId(), appointmentId);
+
+        if (appointment.getStatus() != AppointmentStatus.Confirmada) {
+            throw ApiException.conflict("Solo se pueden completar citas que ya estén Confirmadas");
+        }
+
+        appointment.setStatus(AppointmentStatus.Completada);
+        appointmentRepository.save(appointment);
+        return toDto(appointment);
+    }
+
+    private Dentist resolveDentistProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> ApiException.notFound("Usuario no encontrado"));
+
+        return dentistRepository.findByUserId(user.getId())
+                .orElseThrow(() -> ApiException.notFound(
+                        "Tu cuenta todavía no está vinculada a un perfil de odontólogo"));
+    }
+
+    private Appointment findOwnAppointmentOrThrow(UUID dentistId, UUID appointmentId) {
+        return appointmentRepository.findByIdAndDentistId(appointmentId, dentistId)
+                .orElseThrow(() -> ApiException.notFound("Cita no encontrada"));
     }
 
     private AppointmentDto toDto(Appointment a) {

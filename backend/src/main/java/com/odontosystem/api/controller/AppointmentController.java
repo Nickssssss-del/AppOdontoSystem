@@ -14,11 +14,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Rutas protegidas (requieren JWT):
+ * Lado paciente:
  *  - GET   /api/v1/appointments/my-appointments
  *  - POST  /api/v1/appointments
  *  - PATCH /api/v1/appointments/{id}/cancel
- * Consumidas por AppointmentListViewModel / BookAppointmentViewModel en el cliente Android.
+ * Lado odontólogo:
+ *  - GET   /api/v1/appointments/dentist/my-appointments
+ *  - PATCH /api/v1/appointments/{id}/confirm
+ *  - PATCH /api/v1/appointments/{id}/complete
  */
 @RestController
 @RequestMapping("/api/v1/appointments")
@@ -27,27 +30,40 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+    // ---------- Lado paciente ----------
+
     @GetMapping("/my-appointments")
     public ResponseEntity<List<AppointmentDto>> myAppointments(Authentication authentication) {
-        String email = authentication.getName();
-        return ResponseEntity.ok(appointmentService.findMyAppointments(email));
+        return ResponseEntity.ok(appointmentService.findMyAppointments(authentication.getName()));
     }
 
     @PostMapping
     public ResponseEntity<AppointmentDto> create(
             Authentication authentication,
             @Valid @RequestBody CreateAppointmentRequest request) {
-        String email = authentication.getName();
-        AppointmentDto created = appointmentService.create(email, request);
+        AppointmentDto created = appointmentService.create(authentication.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<AppointmentDto> cancel(
-            Authentication authentication,
-            @PathVariable UUID id) {
-        String email = authentication.getName();
-        AppointmentDto cancelled = appointmentService.cancel(email, id);
-        return ResponseEntity.ok(cancelled);
+    public ResponseEntity<AppointmentDto> cancel(Authentication authentication, @PathVariable UUID id) {
+        return ResponseEntity.ok(appointmentService.cancel(authentication.getName(), id));
+    }
+
+    // ---------- Lado odontólogo ----------
+
+    @GetMapping("/dentist/my-appointments")
+    public ResponseEntity<List<AppointmentDto>> myAppointmentsAsDentist(Authentication authentication) {
+        return ResponseEntity.ok(appointmentService.findMyAppointmentsAsDentist(authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<AppointmentDto> confirm(Authentication authentication, @PathVariable UUID id) {
+        return ResponseEntity.ok(appointmentService.confirm(authentication.getName(), id));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<AppointmentDto> complete(Authentication authentication, @PathVariable UUID id) {
+        return ResponseEntity.ok(appointmentService.complete(authentication.getName(), id));
     }
 }
