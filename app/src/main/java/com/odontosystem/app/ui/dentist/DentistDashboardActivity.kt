@@ -23,7 +23,8 @@ class DentistDashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDentistDashboardBinding
     private lateinit var appointmentAdapter: AppointmentAdapter
-    private val dentistId = "dnt_1"
+    private var dentistId: String = "dnt_1"
+    private var dentistName: String = "Dr. Roberto Ramos"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +32,8 @@ class DentistDashboardActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val sessionManager = (application as OdontoApplication).sessionManager
-        val dentistName = sessionManager.fetchUserName() ?: "Dr. Roberto Ramos"
+        dentistId = sessionManager.fetchUserId() ?: "dnt_1"
+        dentistName = sessionManager.fetchUserName() ?: "Dr. Roberto Ramos"
         binding.tvDentistWelcome.text = "Bienvenido, $dentistName"
 
         setupToolbar(sessionManager)
@@ -124,7 +126,9 @@ class DentistDashboardActivity : AppCompatActivity() {
             val repository = AppointmentRepository(RetrofitClient.apiService)
             val result = withContext(Dispatchers.IO) { repository.getAppointments() }
             result.onSuccess { list ->
-                val mine = list.filter { it.dentistId == dentistId || it.dentistName.contains("Ramos") || it.dentistName.contains("Mendoza") }
+                val mine = list.filter {
+                    it.dentistId == dentistId || it.dentistName.equals(dentistName, ignoreCase = true)
+                }
                 appointmentAdapter.submitList(mine)
                 val blocked = AppointmentStore.isExpressBlocked(dentistId)
                 if (mine.isEmpty()) {

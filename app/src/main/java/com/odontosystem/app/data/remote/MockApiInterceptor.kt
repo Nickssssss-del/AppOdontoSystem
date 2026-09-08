@@ -3,6 +3,7 @@ package com.odontosystem.app.data.remote
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
+import okio.Buffer
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -31,13 +32,33 @@ class MockApiInterceptor : Interceptor {
 
         when {
             path.contains("auth/login") -> {
+                val requestJson = parseRequestJson(request)
+                val role = requestJson?.optString("role", "PATIENT") ?: "PATIENT"
+                val isDentist = role.equals("DENTIST", ignoreCase = true)
                 val json = JSONObject()
-                json.put("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_jwt_token_odontosystem")
+                json.put("token", "demo_jwt_token_abc123")
+                json.put("refreshToken", "demo_refresh_token_abc123")
                 val userJson = JSONObject()
-                userJson.put("id", "usr_1001")
-                userJson.put("name", "Nicole De La Cruz")
-                userJson.put("email", "nicole@odontosystem.com")
-                userJson.put("role", "PATIENT")
+                userJson.put("id", if (isDentist) "dnt_501" else "usr_1001")
+                userJson.put("name", if (isDentist) "Dr. Roberto Ramos" else "Nicole De La Cruz")
+                userJson.put("email", if (isDentist) "dr.ramos@odontosystem.com" else "nicole@odontosystem.com")
+                userJson.put("role", if (isDentist) "DENTIST" else "PATIENT")
+                json.put("user", userJson)
+                responseString = json.toString()
+            }
+
+            path.contains("auth/google") -> {
+                val requestJson = parseRequestJson(request)
+                val role = requestJson?.optString("role", "PATIENT") ?: "PATIENT"
+                val isDentist = role.equals("DENTIST", ignoreCase = true)
+                val json = JSONObject()
+                json.put("token", "demo_google_jwt_token_abc123")
+                json.put("refreshToken", "demo_google_refresh_token_abc123")
+                val userJson = JSONObject()
+                userJson.put("id", if (isDentist) "dnt_501" else "usr_1001")
+                userJson.put("name", if (isDentist) "Dr. Roberto Ramos" else "Nicole De La Cruz")
+                userJson.put("email", if (isDentist) "dr.ramos@odontosystem.com" else "nicole@odontosystem.com")
+                userJson.put("role", if (isDentist) "DENTIST" else "PATIENT")
                 json.put("user", userJson)
                 responseString = json.toString()
             }
@@ -237,4 +258,18 @@ class MockApiInterceptor : Interceptor {
             .addHeader("content-type", "application/json")
             .build()
     }
+
+
+    private fun parseRequestJson(request: Request): JSONObject? {
+        return try {
+            val body = request.body ?: return null
+            val buffer = Buffer()
+            body.writeTo(buffer)
+            val bodyString = buffer.readUtf8()
+            if (bodyString.isBlank()) null else JSONObject(bodyString)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
 }

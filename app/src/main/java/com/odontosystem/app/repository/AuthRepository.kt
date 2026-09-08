@@ -97,9 +97,11 @@ class AuthRepository(
         sessionManager.saveAuthToken("demo_jwt_token")
         sessionManager.saveUserRole(role)
         if (role == UserRole.PATIENT) {
+            sessionManager.saveUserId("usr_101")
             sessionManager.saveUserEmail(customEmail ?: "paciente@odontosystem.com")
             sessionManager.saveUserName("Nicole De La Cruz")
         } else {
+            sessionManager.saveUserId("dnt_501")
             sessionManager.saveUserEmail(customEmail ?: "dr.ramos@odontosystem.com")
             sessionManager.saveUserName("Dr. Roberto Ramos")
         }
@@ -116,8 +118,9 @@ class AuthRepository(
     private fun persistAuthSession(authBody: AuthResponse, role: UserRole) {
         sessionManager.saveAuthToken(authBody.token)
         authBody.refreshToken?.let { sessionManager.saveRefreshToken(it) }
+        sessionManager.saveUserId(authBody.user.id)
         sessionManager.saveUserEmail(authBody.user.email)
         sessionManager.saveUserName(authBody.user.name)
-        sessionManager.saveUserRole(role)
+        sessionManager.saveUserRole(authBody.user.role)
     }
 }

@@ -70,6 +70,14 @@ class SessionManager(context: Context) {
         return prefs.getString(KEY_USER_NAME, null)
     }
 
+    fun saveUserId(userId: String) {
+        prefs.edit().putString(KEY_USER_ID, userId).apply()
+    }
+
+    fun fetchUserId(): String? {
+        return prefs.getString(KEY_USER_ID, null)
+    }
+
     fun saveUserRole(role: UserRole) {
         prefs.edit().putString(KEY_USER_ROLE, role.name).apply()
     }
@@ -95,6 +103,7 @@ class SessionManager(context: Context) {
         private const val PREF_NAME = "encrypted_session_prefs"
         private const val KEY_JWT_TOKEN = "jwt_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_ROLE = "user_role"

@@ -2,6 +2,8 @@ package com.odontosystem.app.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.credentials.CustomCredential
@@ -29,6 +31,7 @@ class LoginActivity : ComponentActivity() {
 
     private lateinit var viewModel: LoginViewModel
     private lateinit var credentialManager: CredentialManager
+    private val tag = "LoginActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,16 +96,18 @@ class LoginActivity : ComponentActivity() {
                     request
                 )
                 handleGoogleCredential(result)
+            } catch (e: androidx.credentials.exceptions.NoCredentialException) {
+                Log.e(tag, "NoCredentialException en Google Sign-In", e)
+                notifyAuthError("No hay cuentas de Google disponibles en este dispositivo.")
+            } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
+                Log.e(tag, "Google Sign-In cancelado por el usuario", e)
+                notifyAuthError("Inicio de sesión con Google cancelado por el usuario.")
+            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+                Log.e(tag, "GetCredentialException en Google Sign-In", e)
+                notifyAuthError("No se pudo completar Google Sign-In. Inténtalo nuevamente.")
             } catch (e: Exception) {
-                val className = e::class.java.simpleName
-                when {
-                    className.contains("Cancellation", ignoreCase = true) ->
-                        viewModel.showAuthError("Inicio de sesión con Google cancelado por el usuario.")
-                    className.contains("NoCredential", ignoreCase = true) ->
-                        viewModel.showAuthError("No hay cuentas de Google disponibles en este dispositivo.")
-                    else ->
-                        viewModel.showAuthError("No se pudo completar Google Sign-In. Inténtalo nuevamente.")
-                }
+                Log.e(tag, "Error no controlado en Google Sign-In", e)
+                notifyAuthError("Error inesperado al iniciar sesión con Google.")
             }
         }
     }
@@ -110,7 +115,7 @@ class LoginActivity : ComponentActivity() {
     private fun buildGoogleCredentialRequest(): GetCredentialRequest {
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(getString(R.string.google_android_client_id))
+            .setServerClientId(getString(R.string.google_web_client_id))
             .setAutoSelectEnabled(false)
             .build()
 
@@ -128,11 +133,18 @@ class LoginActivity : ComponentActivity() {
                 val googleTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 viewModel.loginWithGoogle(googleTokenCredential.idToken)
             } catch (e: GoogleIdTokenParsingException) {
-                viewModel.showAuthError("No se pudo leer el token de Google.")
+                Log.e(tag, "No se pudo parsear el ID token de Google", e)
+                notifyAuthError("No se pudo leer el token de Google.")
             }
             return
         }
 
-        viewModel.showAuthError("Credencial de Google no válida.")
+        Log.e(tag, "Credencial recibida no es GoogleIdTokenCredential: ${credential.type}")
+        notifyAuthError("Credencial de Google no válida.")
+    }
+
+    private fun notifyAuthError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        viewModel.showAuthError(message)
     }
 }

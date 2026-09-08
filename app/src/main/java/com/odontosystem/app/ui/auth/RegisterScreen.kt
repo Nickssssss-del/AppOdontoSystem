@@ -1,6 +1,9 @@
 package com.odontosystem.app.ui.auth
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.odontosystem.app.R
 import com.odontosystem.app.data.model.UserRole
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +48,40 @@ fun RegisterScreen(
     
     // Campos específicos Odontólogo
     var copNumber by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var activeDocumentType by remember { mutableStateOf<DocumentType?>(null) }
+    var uploadingDocumentType by remember { mutableStateOf<DocumentType?>(null) }
+    var uploadError by remember { mutableStateOf<String?>(null) }
+    val selectedDocuments = remember { mutableStateMapOf<DocumentType, Uri>() }
+
+    val documentPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        val selectedType = activeDocumentType
+        activeDocumentType = null
+
+        if (selectedType == null) return@rememberLauncherForActivityResult
+
+        if (uri == null) {
+            uploadError = "No se seleccionó archivo para ${selectedType.label}."
+            uploadingDocumentType = null
+            return@rememberLauncherForActivityResult
+        }
+
+        uploadError = null
+        uploadingDocumentType = selectedType
+        scope.launch {
+            try {
+                // Simula procesamiento de archivo y evita bloqueo infinito de estado.
+                delay(350)
+                selectedDocuments[selectedType] = uri
+                Toast.makeText(context, "${selectedType.label} cargado correctamente.", Toast.LENGTH_SHORT).show()
+            } catch (_: Exception) {
+                uploadError = "No se pudo procesar ${selectedType.label}. Intenta nuevamente."
+            } finally {
+                uploadingDocumentType = null
+            }
+        }
+    }
 
     LaunchedEffect(loginState) {
         if (loginState is LoginViewModel.LoginState.Success) {
@@ -194,24 +233,75 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                DocUploadButton("📄 Subir DNI (PDF/Imagen)")
+                DocUploadButton(
+                    text = "📄 Subir DNI (PDF/Imagen)",
+                    isUploaded = selectedDocuments.containsKey(DocumentType.DNI),
+                    isLoading = uploadingDocumentType == DocumentType.DNI,
+                    onClick = {
+                        uploadError = null
+                        activeDocumentType = DocumentType.DNI
+                        documentPickerLauncher.launch("*/*")
+                    }
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                DocUploadButton("📄 Subir Título Profesional")
+                DocUploadButton(
+                    text = "📄 Subir Título Profesional",
+                    isUploaded = selectedDocuments.containsKey(DocumentType.TITLE),
+                    isLoading = uploadingDocumentType == DocumentType.TITLE,
+                    onClick = {
+                        uploadError = null
+                        activeDocumentType = DocumentType.TITLE
+                        documentPickerLauncher.launch("*/*")
+                    }
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                DocUploadButton("📄 Subir CV Actualizado")
+                DocUploadButton(
+                    text = "📄 Subir CV Actualizado",
+                    isUploaded = selectedDocuments.containsKey(DocumentType.CV),
+                    isLoading = uploadingDocumentType == DocumentType.CV,
+                    onClick = {
+                        uploadError = null
+                        activeDocumentType = DocumentType.CV
+                        documentPickerLauncher.launch("*/*")
+                    }
+                )
+
+                if (uploadError != null) {
+                    Text(
+                        text = uploadError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = {
+                    val role = if (selectedTab == 0) UserRole.PATIENT else UserRole.DENTIST
+                    if (role == UserRole.DENTIST) {
+                        if (copNumber.isBlank()) {
+                            Toast.makeText(context, "Ingresa tu número de colegiatura.", Toast.LENGTH_LONG).show()
+                            return@Button
+                        }
+                        val requiredDocs = setOf(DocumentType.DNI, DocumentType.TITLE, DocumentType.CV)
+                        if (!selectedDocuments.keys.containsAll(requiredDocs)) {
+                            Toast.makeText(context, "Debes subir DNI, Título y CV para registrarte como odontólogo.", Toast.LENGTH_LONG).show()
+                            return@Button
+                        }
+                    }
+
                     viewModel.register(
                         name = name,
                         lastName = lastName,
                         email = email,
                         phone = phone,
                         pass = password,
-                        role = if (selectedTab == 0) UserRole.PATIENT else UserRole.DENTIST,
+                        role = role,
                         copNumber = if (selectedTab == 1) copNumber else null
                     )
                 },
@@ -221,6 +311,7 @@ fun RegisterScreen(
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary)),
                 enabled = loginState !is LoginViewModel.LoginState.Loading
+                    && uploadingDocumentType == null
             ) {
                 if (loginState is LoginViewModel.LoginState.Loading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -244,13 +335,21 @@ fun RegisterScreen(
 }
 
 @Composable
-fun DocUploadButton(text: String) {
-    val context = LocalContext.current
+fun DocUploadButton(
+    text: String,
+    isUploaded: Boolean,
+    isLoading: Boolean,
+    onClick: () -> Unit
+) {
     OutlinedButton(
-        onClick = { Toast.makeText(context, "Seleccionando archivo...", Toast.LENGTH_SHORT).show() },
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = R.color.text_muted))
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (isUploaded) colorResource(id = R.color.primary) else colorResource(id = R.color.text_muted)
+        ),
+        enabled = !isLoading
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -258,7 +357,18 @@ fun DocUploadButton(text: String) {
         ) {
             Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(12.dp))
-            Text(text, fontSize = 13.sp, color = colorResource(id = R.color.text_secondary))
+            val label = when {
+                isLoading -> "Subiendo documento..."
+                isUploaded -> "✅ Documento cargado"
+                else -> text
+            }
+            Text(label, fontSize = 13.sp, color = colorResource(id = R.color.text_secondary))
         }
     }
+}
+
+private enum class DocumentType(val label: String) {
+    DNI("DNI"),
+    TITLE("Título Profesional"),
+    CV("CV Actualizado")
 }

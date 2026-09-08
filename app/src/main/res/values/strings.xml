@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OdontoSystem</string>
-    <string name="google_android_client_id">REEMPLAZAR_ANDROID_CLIENT_ID.apps.googleusercontent.com</string>
+    <string name="google_web_client_id">REEMPLAZAR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
     <string name="welcome_back">¡Bienvenido a OdontoSystem!</string>
     <string name="login_subtitle">Reserva odontólogos independientes en Ica sin llamadas</string>
     <string name="email_label">Correo Electrónico</string>
