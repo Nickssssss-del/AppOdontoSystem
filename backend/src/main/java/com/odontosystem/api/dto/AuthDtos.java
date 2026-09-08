@@ -83,4 +83,22 @@ public class AuthDtos {
         @NotBlank
         private String refreshToken;
     }
+
+    /**
+     * Body de POST /api/v1/auth/google. El cliente Android obtiene este
+     * idToken con el SDK de Google Sign-In / Credential Manager; el
+     * backend lo valida contra Google antes de emitir sus propios
+     * tokens JWT + refresh token.
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoogleAuthRequest {
+        @NotBlank
+        private String idToken;
+
+        /** Solo se usa si es la primera vez que este correo inicia sesión. */
+        private UserRole role = UserRole.PATIENT;
+    }
 }

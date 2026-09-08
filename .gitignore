@@ -1,0 +1,34 @@
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Gradle ###
+.gradle/
+build/
+
+### Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### VS Code ###
+.vscode/
+
+### Android ###
+*.apk
+*.ap_
+*.dex
+local.properties
+.cxx/
+captures/
+
+### Variables de entorno / secretos ###
+.env
+*.env.local
+
+### Sistema operativo ###
+.DS_Store
+Thumbs.db
