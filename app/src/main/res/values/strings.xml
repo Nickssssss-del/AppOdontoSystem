@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OdontoSystem</string>
-<<<<<<< Updated upstream
-    <string name="google_web_client_id">REEMPLAZAR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
-=======
     <string name="default_web_client_id" translatable="false">284435061520-6onqqce2j594881k27u464jh4fnpvme4.apps.googleusercontent.com</string>
-    <string name="google_web_client_id">REEMPLAZAR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
+    <string name="google_web_client_id" translatable="false">284435061520-6onqqce2j594881k27u464jh4fnpvme4.apps.googleusercontent.com</string>
     <string name="btn_google_signin">Continuar con Google</string>
     <string name="google_signin_error">No se pudo iniciar sesión con Google. Intenta de nuevo.</string>
->>>>>>> Stashed changes
     <string name="welcome_back">¡Bienvenido a OdontoSystem!</string>
     <string name="login_subtitle">Reserva odontólogos independientes en Ica sin llamadas</string>
     <string name="email_label">Correo Electrónico</string>
