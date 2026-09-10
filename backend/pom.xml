@@ -105,6 +105,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Verificación de tokens de Google Sign-In -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
         <!-- Documentación de API: Swagger UI / OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>

@@ -2,6 +2,8 @@ package com.odontosystem.api.controller;
 
 import com.odontosystem.api.dto.AuthDtos.AuthRequest;
 import com.odontosystem.api.dto.AuthDtos.AuthResponse;
+import com.odontosystem.api.dto.AuthDtos.GoogleAuthRequest;
+import com.odontosystem.api.dto.AuthDtos.RegisterRequest;
 import com.odontosystem.api.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +24,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.register(request));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> loginWithGoogle(@Valid @RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok(authService.loginWithGoogle(request));
     }
 }

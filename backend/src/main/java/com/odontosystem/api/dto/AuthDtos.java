@@ -38,9 +38,49 @@ public class AuthDtos {
     public static class UserDto {
         private UUID id;
         private String name;
+        private String lastName;
         private String email;
         private UserRole role;
         private String phone;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RegisterRequest {
+        @NotBlank
+        private String name;
+
+        @NotBlank
+        private String lastName;
+
+        @NotBlank
+        @Email
+        private String email;
+
+        @NotBlank
+        private String phone;
+
+        @NotBlank
+        private String password;
+
+        private UserRole role = UserRole.PATIENT;
+
+        private String copNumber;
+
+        private java.util.List<String> documents;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoogleAuthRequest {
+        @NotBlank
+        private String idToken;
+
+        private UserRole role = UserRole.PATIENT;
     }
 
     /** Espejo exacto de `AuthResponse` en AuthModels.kt */

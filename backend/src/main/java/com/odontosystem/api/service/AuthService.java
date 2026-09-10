@@ -1,7 +1,11 @@
 package com.odontosystem.api.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.odontosystem.api.dto.AuthDtos.AuthRequest;
 import com.odontosystem.api.dto.AuthDtos.AuthResponse;
+import com.odontosystem.api.dto.AuthDtos.GoogleAuthRequest;
+import com.odontosystem.api.dto.AuthDtos.RegisterRequest;
 import com.odontosystem.api.dto.AuthDtos.UserDto;
 import com.odontosystem.api.entity.User;
 import com.odontosystem.api.entity.UserRole;
@@ -29,6 +33,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final GoogleIdTokenVerifier googleTokenVerifier;
 
     @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
@@ -48,19 +53,61 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse register(String name, String email, String rawPassword, UserRole role) {
-        if (userRepository.existsByEmail(email)) {
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw ApiException.conflict("Ya existe una cuenta registrada con ese correo");
         }
 
         User user = User.builder()
-                .name(name)
-                .email(email)
-                .passwordHash(passwordEncoder.encode(rawPassword))
-                .role(role)
+                .name(request.getName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .phone(request.getPhone())
+                .copNumber(request.getCopNumber())
                 .build();
 
         userRepository.save(user);
+
+        String token = jwtService.generateToken(user.getEmail(), user.getId().toString(), user.getRole().name());
+
+        return AuthResponse.builder()
+                .token(token)
+                .user(toDto(user))
+                .build();
+    }
+
+    @Transactional
+    public AuthResponse loginWithGoogle(GoogleAuthRequest request) {
+        GoogleIdToken googleIdToken;
+        try {
+            googleIdToken = googleTokenVerifier.verify(request.getIdToken());
+        } catch (java.security.GeneralSecurityException | java.io.IOException e) {
+            throw ApiException.badRequest("Token de Google inválido");
+        }
+
+        if (googleIdToken == null) {
+            throw ApiException.badRequest("Token de Google inválido");
+        }
+
+        GoogleIdToken.Payload payload = googleIdToken.getPayload();
+        String email = payload.getEmail();
+        String name = (String) payload.get("given_name");
+        String lastName = (String) payload.get("family_name");
+        String googleId = payload.getSubject();
+
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = User.builder()
+                    .name(name != null ? name : "Usuario")
+                    .lastName(lastName)
+                    .email(email)
+                    .passwordHash(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
+                    .role(request.getRole())
+                    .googleId(googleId)
+                    .build();
+            return userRepository.save(newUser);
+        });
 
         String token = jwtService.generateToken(user.getEmail(), user.getId().toString(), user.getRole().name());
 
@@ -74,6 +121,7 @@ public class AuthService {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .phone(user.getPhone())

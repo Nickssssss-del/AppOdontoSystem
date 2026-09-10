@@ -46,6 +46,19 @@ public class User {
     @Builder.Default
     private String phone = "+51987654321";
 
+    @Column(name = "last_name", length = 150)
+    private String lastName;
+
+    @Column(name = "cop_number", length = 50)
+    private String copNumber;
+
+    @Column(name = "documents", columnDefinition = "text[]")
+    @org.hibernate.annotations.JdbcTypeCode(java.sql.Types.ARRAY)
+    private String[] documents;
+
+    @Column(name = "google_id", unique = true)
+    private String googleId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
