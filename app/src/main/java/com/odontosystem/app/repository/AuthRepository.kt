@@ -39,7 +39,43 @@ class AuthRepository(
             } else {
                 User("dnt_501", "Dr. Roberto Mendoza", email, UserRole.DENTIST)
             }
+<<<<<<< Updated upstream
             Result.success(AuthResponse("demo_jwt_token", demoUser))
+=======
+        }
+
+    suspend fun loginWithGoogle(idToken: String, role: UserRole): Result<AuthResponse> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.loginWithGoogle(GoogleAuthRequest(idToken, role))
+                if (response.isSuccessful && response.body() != null) {
+                    val authBody = response.body()!!
+                    sessionManager.saveAuthToken(authBody.token)
+                    sessionManager.saveRefreshToken(authBody.refreshToken)
+                    sessionManager.saveUserEmail(authBody.user.email)
+                    sessionManager.saveUserName(authBody.user.name)
+                    sessionManager.saveUserRole(authBody.user.role)
+                    Result.success(authBody)
+                } else {
+                    Result.failure(Exception(errorMessage(response)))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    /**
+     * Propaga el detalle real del error del backend (código HTTP + body) para facilitar
+     * diagnóstico durante el login con Google y el resto de autenticación.
+     */
+    private fun errorMessage(response: Response<*>): String {
+        val code = response.code()
+        val rawBody = response.errorBody()?.string()?.trim().orEmpty()
+        return if (rawBody.isNotEmpty()) {
+            "HTTP ${code} - ${rawBody}"
+        } else {
+            "HTTP ${code} - Error del servidor sin cuerpo de respuesta."
+>>>>>>> Stashed changes
         }
     }
 

@@ -59,6 +59,10 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.inflateMenu(com.odontosystem.app.R.menu.menu_main)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.itemId == com.odontosystem.app.R.id.action_logout) {
+                val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions
+                    .Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .build()
+                com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this, gso).signOut()
                 sessionManager.clearSession()
                 startActivity(Intent(this, com.odontosystem.app.ui.auth.LoginActivity::class.java))
                 finish()

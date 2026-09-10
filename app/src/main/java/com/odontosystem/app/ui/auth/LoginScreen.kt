@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -221,6 +222,33 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+<<<<<<< Updated upstream
+=======
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Divider(
+                            modifier = Modifier.weight(1f),
+                            thickness = 1.dp,
+                            color = Color(0xFFE0E7EF)
+                        )
+                        Text(
+                            text = "O",
+                            color = colorResource(id = R.color.text_muted),
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(horizontal = 12.dp)
+                        )
+                        Divider(
+                            modifier = Modifier.weight(1f),
+                            thickness = 1.dp,
+                            color = Color(0xFFE0E7EF)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+>>>>>>> Stashed changes
                     OutlinedButton(
                         onClick = onGoogleSignInClick,
                         modifier = Modifier
@@ -230,7 +258,25 @@ fun LoginScreen(
                         border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = R.color.primary)),
                         enabled = loginState !is LoginViewModel.LoginState.Loading
                     ) {
+<<<<<<< Updated upstream
                         Text("Continuar con Google", fontSize = 14.sp)
+=======
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_google_logo),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = stringResource(id = R.string.btn_google_signin),
+                                fontSize = 14.sp
+                            )
+                        }
+>>>>>>> Stashed changes
                     }
 
                     if (loginState is LoginViewModel.LoginState.Error) {

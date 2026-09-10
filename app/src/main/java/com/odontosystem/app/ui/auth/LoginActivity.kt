@@ -6,10 +6,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+<<<<<<< Updated upstream
 import androidx.credentials.CustomCredential
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+=======
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+>>>>>>> Stashed changes
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,16 +27,28 @@ import com.odontosystem.app.data.remote.RetrofitClient
 import com.odontosystem.app.repository.AuthRepository
 import com.odontosystem.app.ui.dentist.DentistDashboardActivity
 import com.odontosystem.app.ui.main.MainActivity
+<<<<<<< Updated upstream
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.launch
+=======
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+>>>>>>> Stashed changes
 
 class LoginActivity : ComponentActivity() {
 
     private lateinit var viewModel: LoginViewModel
+<<<<<<< Updated upstream
     private lateinit var credentialManager: CredentialManager
     private val tag = "LoginActivity"
+=======
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
+>>>>>>> Stashed changes
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +57,53 @@ class LoginActivity : ComponentActivity() {
         val repository = AuthRepository(RetrofitClient.apiService, sessionManager)
         viewModel = LoginViewModel(repository)
         credentialManager = CredentialManager.create(this)
+
+        googleSignInClient = GoogleSignIn.getClient(
+            this,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+        )
+
+        googleSignInLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    .getResult(ApiException::class.java)
+                val idToken = account.idToken
+
+                if (idToken.isNullOrBlank()) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.google_signin_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@registerForActivityResult
+                }
+
+                Toast.makeText(this, "Cuenta usada: ${account.email}", Toast.LENGTH_LONG).show()
+                viewModel.loginWithGoogle(idToken)
+            } catch (e: ApiException) {
+                val statusCode = e.statusCode
+                Log.e(
+                    "LoginActivity",
+                    "Google Sign-In ApiException statusCode=$statusCode message=${e.message}",
+                    e
+                )
+
+                if (statusCode == 12501) {
+                    return@registerForActivityResult
+                }
+
+                val message = if (statusCode == 10) {
+                    "Error de configuración (DEVELOPER_ERROR) - revisar SHA-1 en Google Cloud Console"
+                } else {
+                    "Error de Google Sign-In (statusCode=$statusCode): ${e.message ?: getString(R.string.google_signin_error)}"
+                }
+
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            }
+        }
 
         // Check if already logged in
         if (repository.isLoggedIn()) {
@@ -64,7 +128,13 @@ class LoginActivity : ComponentActivity() {
                     viewModel = viewModel,
                     onNavigateToRegister = { navController.navigate("register") },
                     onLoginSuccess = onLoginSuccess,
+<<<<<<< Updated upstream
                     onGoogleSignInClick = { startGoogleSignIn() }
+=======
+                    onGoogleSignInClick = {
+                        googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                    }
+>>>>>>> Stashed changes
                 )
             }
             composable("register") {

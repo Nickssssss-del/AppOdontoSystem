@@ -26,7 +26,11 @@ data class AuthResponse(
 
 data class GoogleAuthRequest(
     val idToken: String,
+<<<<<<< Updated upstream
     val role: UserRole
+=======
+    val role: UserRole = UserRole.PATIENT
+>>>>>>> Stashed changes
 )
 
 data class RegisterRequest(

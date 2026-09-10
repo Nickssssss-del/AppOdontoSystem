@@ -62,10 +62,13 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
                 _loginState.value = LoginState.Error(message)
             }
         }
+<<<<<<< Updated upstream
 
         fun showAuthError(message: String) {
             _loginState.value = LoginState.Error(message)
         }
+=======
+>>>>>>> Stashed changes
     }
 
     fun register(
